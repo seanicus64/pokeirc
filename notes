@@ -1,0 +1,64 @@
+#go myself - throw rocks
+
+all 151 pokemon
+different rates of 
+
+lurestones attract specific kind of pokemon - electric, flying, etc, also "legendary" lures
+
+#lure 
+
+types: bug, dragon, electric, fighting, fire, flying, ghost, grass, ground, ice, normal, poison, psychic, rock, water
+#lure fire
+* Sean went into a volcano and set a fire-lure!
+
+bug - forest - basement?
+dragon - shining lake
+electric - power plant
+fighting - gym? city?
+fire - volcano
+flying - mountains
+ghost - cemetary
+grass - forest?  then what bug - basement?
+ground - a pit, quarry?
+ice - glacier
+normal - field
+poison - sewer
+psychic - temple?  other dimension?  inner sanctum of the mind?
+rock - mineshaft, quarry?
+water - beach, on a boat
+legendary - altar?
+
+each pokemon has one type assigned to it
+each pokemon has one move assigne dto it
+
+* Wild psyduck (level 20) appeared! * 
+#ryhorn, catch
+#ryhorn, kill
+* ryhorn stomped psyduck into submission and Sean caught him with his pokeball! Ryhorn is now level 23 34% health
+
+if pokemon sent out is too high, pokemon will run away from player (who will no longer be able to catch him)
+all pokemon are kept but only 6 in party at a time
+pokemon die permanently
+pokemon evolve
+pokemon have different base stats which have a level multiplier
+
+#party
+* Sean's party: Pikachu-45 (56%) Snorlax-60 (100%) Blastoise-30 (100%)
+#transfer account
+
+#party <name>
+#go <pokemon|self>
+#set_capture on
+#lure <lurestone>
+#challenge <player>
+#swap <current_pkmn> <boxed_pokemon>
+#stats
+
+*A wild Pikachu appeared*
+*Pikachu wandered away*
+*Pikachu ran away from Sean*
+*Pikachu evolved into Raichu!*
+*Pikachu defeated Squirtle.*
+*Pikachu gained 20exp and reached level 20*
+*Sean captured Pikachu, who was transferred to his PC*
+
