@@ -3,6 +3,7 @@ import socket
 import random
 import time
 import math
+import sqlite3
 from datetime import datetime
 HOST = "irc.alphachat.net"
 PORT = 6667
@@ -229,9 +230,11 @@ pokemon_dict = {
     }   
 slow_medium_levels = [0] # original formula has a negative
     # which caused an integer underflow.  Just set it to 0.
+
 for n in range(2, 101):
     exp = (6/5)*n**3 - 15 * n**2 + 100*n - 140
     slow_medium_levels.append(exp)
+
 def get_level_from_exp_slow_medium(exp):
     L = 0
     for n in slow_medium_levels:
@@ -251,8 +254,10 @@ common = []
 average = []
 rare = []
 legendary = []
+
 for p in pokemon_dict.keys():
     lowest_levels[p] = 0
+
 for p, k in pokemon_dict.items():
     evolution_data = k[6]
     if evolution_data[0] != "XXXXXXXX":
@@ -281,25 +286,28 @@ for p, k in pokemon_dict.items():
         tiers[3].append(p)
         
 s = sorted(a, key=lambda x: x[1])
+
 for w in s:
     print(w)
 #sys.exit()
+
 class BadCommand(Exception):
     pass
+
 class Player(object):
     def __init__(self, name):
         self.name = name
         self.party = []
         self.stored = []
         self.stored = [Pokemon("squirtle", 5), Pokemon("dratini", 30), Pokemon("charmander", 5), Pokemon("bulbasaur", 5)]
-#        for p in range(100):
-#            self.stored.append(Pokemon("Mew", 100))
+
     def add_pokemon(self, pokemon):
         if len(self.party) < 6:
             self.party.append(pokemon)
         else:
             self.stored.append(pokemon)
         print(self.party)
+
 class Pokemon(object):
     def __init__(self, species, level):
         self.level = level
@@ -308,8 +316,6 @@ class Pokemon(object):
         # This is just random.  I'm not going to implement a faithful attack system.
         self.moves = [("attack", 40), ("attack", 80), ("special attack", 40), ("special attack", 80), ("lower defense")]
         self.captured = False
-
-
         self.exp = 0
         self.get_experience()
         self.ev = 0 #TODO: study how EVs work, might not bother though
@@ -325,7 +331,6 @@ class Pokemon(object):
         self.sattack_ev = 0
         self.sdefense_ev = 0
         self.speed_ev = 0
-
         self.hp()
         self._hp = self.max_hp
         self.attack()
@@ -333,10 +338,9 @@ class Pokemon(object):
         self.special_attack()
         self.special_defense()
         self.speed()
-        print("The base hp is {}".format(self._hp))
+        self.defeated_by = None
 
     def get_stats(self):
-        pass
         self.stats = pokemon_dict[self.name.capitalize()]
         self.index = self.stats[0]
         self.type = self.stats[1]
@@ -345,17 +349,19 @@ class Pokemon(object):
         self.base_experience_value = self.stats[4]
         self.base_hp, self.base_att, self.base_def, self.base_satt, self.base_sdef, self.base_spd = self.stats[5]
         self.evolution, self.evolution_level  = self.stats[6]
+
     def get_experience(self):
         if self.growth_rate == 0:
             exp = (5 * self.level ** 3)/4
         elif self.growth_rate == 1:
-            exp = (6/5)*self.level**3 - 15 * self.level**2 + 100*self.level - 140
+            exp = (6/5)*self.level**3 - 15 * self.level**2 + 100 * self.level - 140
         elif self.growth_rate == 2:
             exp = self.level**3
         elif self.growth_rate == 3:
             exp = (4 * self.level**3)/5
-        self.exp = exp
+        self.exp = int(exp)
         return exp
+
     def gain_ev(self, loser):
         # TODO: set max for these
         self.health_ev += loser.base_hp
@@ -380,23 +386,20 @@ class Pokemon(object):
         exp_change = int((a * t * b * e * L * p * f * v)/ (7 * s))
         self.exp += exp_change
         return exp_change
+
     def evolve(self):
         self.name = self.evolution
         self.get_stats()
         self._hp = self.max_hp
         
     def check_level(self):
-        print(f"THE GROWTH RATE IS {self.growth_rate}")
         if self.growth_rate == 3: # fast
             level = round(((5*self.exp)/4)**(1/3))
         elif self.growth_rate == 2:
             level = round(self.exp**(1/3))
         elif self.growth_rate == 1:
             # I skipped "solving cubic function" day
-            print(self.exp)
             level = get_level_from_exp_slow_medium(self.exp)
-            print("LEVEL IS")
-            print(level)
         elif self.growth_rate == 0:
             n = ((4 * self.exp)/5) ** (1/3)
             level = round(n)
@@ -413,32 +416,28 @@ class Pokemon(object):
             return level
         else:
             return False
-            
-#def get_level_from_exp_slow_medium(exp):
-           
 
     def hp_to_percent(self):
         return int(self._hp / self.max_hp * 100)
+
     def hp(self):
-        print("hp")
         self.max_hp = round((((self.base_hp + self.health_iv) * 2 + round(math.sqrt(self.health_ev)/4)) * self.level)/100) + self.level + 10
+
     def attack(self):
-        print("attack")
         self._attack = round((((self.base_att + self.attack_iv) * 2 + round(math.sqrt(self.attack_ev)/4)) * self.level)/100) + 5
-        print(f"{self}  _attack: {self._attack} base_att:{self.base_att} attack_iv:{self.attack_iv} attack_ev:{self.attack_ev} level:{self.level}")
 
     def defense(self):
-        print("defense")
         self._defense = round((((self.base_def + self.defense_iv) * 2 + round(math.sqrt(self.defense_ev)/4)) * self.level)/100) + 5
+
     def special_attack(self):
-        print("sattack")
         self._sattack = round((((self.base_satt + self.sattack_iv) * 2 + round(math.sqrt(self.sattack_ev)/4)) * self.level)/100) + 5
+
     def special_defense(self):
-        print("sdefense")
         self._sdefense = round((((self.base_sdef + self.sdefense_iv) * 2 + round(math.sqrt(self.sdefense_ev)/4)) * self.level)/100) + 5
+
     def speed(self):
-        print("speed")
         self._speed = round((((self.base_spd + self.speed_iv) * 2 + round(math.sqrt(self.speed_ev)/4)) * self.level)/100) + 5
+
     def __repr__(self):
         hp_percent = self.hp_to_percent()
         if hp_percent > 66:
@@ -458,7 +457,6 @@ class Client(object):
         self.now = int(time.time())
         self.next_pokemon_appearance = None
         self.players = []
-        print(self.now)
         self.channel = channel
 
     def connect(self):
@@ -466,13 +464,11 @@ class Client(object):
         self.send("NICK ProfOak")
     def join(self, channel):
         message = f"JOIN {channel}"
-        print("\033[32mIN JOIN FUNCTION\033[0m")
         self.send(message)
     
     def send(self, message):
         message += "\r\n"
         to_send_back = bytes(message.encode("utf-8")) 
-        print(to_send_back)
         self.socket.sendall(to_send_back)
 
     def send_to(self, recipient, message):
@@ -484,21 +480,21 @@ class Client(object):
             submessage = message[n*400:(n+1)*400]
             self.send(f"PRIVMSG {recipient} :{submessage}")
 
+
     def handle_ping(self, data):
-        print("inside ping funcitokn")
         self.send(f"PONG {data[1]}")
+
     @property
     def player_list(self):
         return [p.name for p in self.players]
+
     def handle_privmsg(self, data):
-        print("PRIVMSG", data)
         nick = data[0].partition("!")[0]
         message = " ".join(data[3:])
         message = message.lstrip(":").lower()
         split = message.split()
         player_cmd = split[0]
-        if player_cmd == "test":
-            print("ZZZZZZZZZZZZZ" + str(self.player_list))
+
         if player_cmd == "#starter":
             self.parse_starter(nick, split)
         if player_cmd == "#go":
@@ -513,10 +509,70 @@ class Client(object):
             self.parse_pc(nick)
         elif player_cmd == "#swap":
             self.parse_swap(nick, split)
+        elif player_cmd == "#repel":
+            self.parse_repel(nick)
         elif player_cmd == "#commands":
-            self.parse_commands(nick, split)
-    def parse_commands(self, nick, split):
-        self.send_to(self.channel, "#starter #go #examine #team #pc #swap #commands")
+            self.parse_commands(nick)
+        elif player_cmd == "#release":
+            self.parse_release(nick, split)
+        elif player_cmd == "#catch":
+            self.parse_catch(nick)
+    
+    def parse_catch(self, nick):
+        if nick not in self.player_list:
+            raise BadCommand(f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
+        player = self.get_player(nick)
+        if self.fainted_pokemon:
+            if self.fainted_pokemon.defeated_by != player:
+                raise BadCommand(f"{nick}: Only the player who defeated {self.fainted_pokemon} may catch it! you: {player}, defeater: {self.fainted_pokemon.defeated_by}")
+            else:
+                player.add_pokemon(self.fainted_pokemon)
+                self.send_to(self.channel, f"{nick} caught the {self.fainted_pokemon}")
+                self.fainted_pokemon = None
+        else:
+            raise BadCommand(f"{nick}: There is no pokemon to catch.  Are you confused?")
+            
+        
+
+    def parse_release(self, nick, command):
+        if nick not in self.player_list:
+            raise BadCommand(f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
+        player = self.get_player(nick)
+        if len(command) != 3:
+            raise BadCommand(f"{nick}: Syntax: #release <location_id> <pokemon_name> .  e.g. '#release D pidgey' if in party or '#release 5 rattata' if in PC")
+        location_id = command[1]
+        pokemon_name = command[2]
+        if not location_id.isdigit() and not location_id.lower() in "abcdef":
+            raise BadCommand(f"{nick}: Syntax: #release <location_id> <pokemon_name> .  e.g. '#release D pidgey' if in party or '#release 5 rattata' if in PC")
+
+        if location_id.isdigit():
+            index = int(location_id)
+            container = player.stored
+        elif location_id.lower() in "abcdef":
+            index = "abcdef".index(location_id.lower())
+            container = player.party
+        else:
+            raise BadCommand(f"{nick}: Syntax: #release <location_id> <pokemon_name> .  e.g. '#release D pidgey' if in party or '#release 5 rattata' if in PC")
+        try:
+            idx, _, pokemon = self.get_pokemon(location_id, player, has_to_be = "party" if container == player.party else "PC")
+        except IndexError:
+            raise BadCommand(f"{nick}: You have no pokemon under the location ID of {location_id}. Please check #team and #PC")
+        if pokemon.name.lower() != pokemon_name.lower():
+            raise BadCommand(f"{nick}: There is no pokemon of the name {pokemon_name} under the location ID of {location_id}. Please check #team and #PC")
+        else:
+            self.send_to(self.channel, f"{nick} released {pokemon} into the wilderness.  Good luck, {pokemon}!")
+            container.remove(pokemon)
+            del pokemon
+            
+         
+
+    def parse_repel(self, nick):
+        self.repelling = True
+        self.send_to(self.channel, f"{nick} set a repel.  Pokemon won't appear for another half hour.")
+
+    def parse_commands(self, nick):
+        self.send_to(self.channel, "#starter #go #examine #team #pc #swap #repel #release #commands")
+
     def find_which_pokemon(self, label, container):
         pokemon = None
         label = label.lower()
@@ -529,96 +585,71 @@ class Client(object):
                 if p.name.lower() == label:
                     pokemon = p
         return pokemon
-        #pc_pokemon = command[2]
-#        if party_pokemon.isdigit():
-#            which_pokemon = int(party_pokemon)
-#            if 0 <= which_pokemon < len(p.party):
-#                party_pokemon = p.party[which_pokemon]
-#        else:
-#            for p in player.party:
-#                if p.name.lower() == party_pokemon:
-#                    party_pokemon = p
+
     def parse_swap(self, nick, command):
-        
-        
         if nick not in self.player_list:
             raise BadCommand(f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
 
-        for p in self.players:
-            if nick == p.name:
-                player = p
+        player = self.get_player(nick)
+
         if len(command) != 3:
-            raise BadCommand(f"{nick}: Syntax: #swap <party_pokemon or _> <PC_pokemon or _>")
-        party_pokemon = command[1].lower()
-        pc_pokemon = command[2]
-        party_pokemon = self.find_which_pokemon(party_pokemon, player.party)
-        pc_pokemon = self.find_which_pokemon(pc_pokemon, player.stored)
-        if not party_pokemon:
-            raise BadCommand(f"{nick}: that is not a valid pokemon")
-        if not pc_pokemon:
-            raise BadCommand(f"{nick}: that is not a valid pokemon")
-        player.party.remove(party_pokemon)
-        player.stored.remove(pc_pokemon)
-        player.party.append(pc_pokemon)
-        print(player.stored)
-        player.stored.append(party_pokemon)
-        print(player.stored)
-        print("success?")
-        self.send_to(self.channel, f"Swap successful")
-    def parse_pc(self, nick):
+            raise BadCommand(f"{nick}: Syntax: #swap <party_pokemon> <PC_pokemon>")
+
+        first_pokemon = command[1].lower()
+        second_pokemon = command[2].lower()
+        first_has_to_be = "Neither"
+        second_has_to_be = "Neither"
+        if not first_pokemon.isdigit() and not first_pokemon.lower() in "abcdef":
+            first_has_to_be = "party"
+        if not second_pokemon.isdigit() and not second_pokemon.lower() in "abcdef":
+            second_has_to_be = "PC"
+
+        first_idx, first_container, first_pokemon = self.get_pokemon(first_pokemon, player, first_has_to_be)
+        second_idx, second_container, second_pokemon = self.get_pokemon(second_pokemon, player, second_has_to_be)
         
+        first_container[first_idx] = second_pokemon
+        second_container[second_idx] = first_pokemon
+        message = f"{nick} swapped {first_pokemon} with {second_pokemon}"
+        self.send_to(self.channel, message)
+
+    def parse_pc(self, nick):
         if nick not in self.player_list:
             raise BadCommand(f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
-
-        for p in self.players:
-            if nick == p.name:
-                player = p
+        player = self.get_player(nick)
         message = ""
         for num, pokemon in enumerate(player.stored):
-            message += f"{num}: {pokemon} "
-
-        #message = "{' '.join([player.stored])}"
+            message += f"{num}:{pokemon} "
         self.send_to(self.channel, message)
+
     def parse_examine(self, nick, command):
         if nick not in self.player_list:
             raise BadCommand(f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
         if len(command) < 2:
             raise BadCommand(f"{nick}: Syntax: #examine <pokemon>")
-
-        for p in self.players:
-            if nick == p.name:
-                player = p
-        the_pokemon = None
-        for pokemon in player.party:
-            if command[1].lower() == pokemon.name.lower():
-                the_pokemon = pokemon
-        if not the_pokemon:
-            raise BadCommand(f"{nick}: That is not a pokemon you have.")
-        pkmn = the_pokemon
+        player = self.get_player(nick)
+        index, container, pkmn = self.get_pokemon(command[1].lower(), player)
         growth_dict = {0: "slow", 1: "medium-slow", 2: "medium-fast", 3: "fast"}
         message = f"{pkmn.name} \x0300Lvl\x03:{pkmn.level} \x0300EXP\x03:{pkmn.exp} \x0300HP\x03:{pkmn._hp} \x0300MaxHP\x03:{pkmn.max_hp} \x0300Health\x03:{int(pkmn._hp/pkmn.max_hp*100)}% "
         message += f"\x0304Att\x03:{pkmn._attack} \x0304Def\x03:{pkmn._defense} \x0304SAtt\x03:{pkmn._sattack} \x0304SDef\x03:{pkmn._sdefense} \x0304Spd\x03:{pkmn._speed} "
         message += f"\x0302h_iv\x03:{pkmn.health_iv} \x0302a_iv\x03:{pkmn.attack_iv} \x0302d_iv\x03:{pkmn.defense_iv} \x0302sa_iv\x03:{pkmn.sattack_iv} \x0302sd_iv\x03:{pkmn.sdefense_iv} \x0302spd_iv\x03:{pkmn.speed_iv} "
-
         message += f"\x0303h_ev\x03:{pkmn.health_ev} \x0303a_ev\x03:{pkmn.attack_ev} \x0303d_ev\x03:{pkmn.defense_ev} \x0303sa_ev\x03:{pkmn.sattack_ev} \x0303sd_ev\x03:{pkmn.sdefense_ev} \x0303spd_ev\x03:{pkmn.speed_ev} "
         message += f"\x0300GrowthRate\x03:{growth_dict[pkmn.growth_rate]}"
         self.send_to(self.channel, message)
+
     def parse_heal(self, nick):
         if nick not in self.player_list:
             raise BadCommand(f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
-        for p in self.players:
-            if nick == p.name:
-                player = p
+        player = self.get_player(nick)
         for pokemon in player.party:
             pokemon._hp = pokemon.max_hp
+
     def parse_team(self, nick):
         if nick not in self.player_list:
             raise BadCommand(f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
+        player = self.get_player(nick)
+        letters = "ABCDEF"
+        self.send_to(self.channel, f"{nick}'s team: {', '.join([f'{letters[L]}:{p}|{int(p._hp/p.max_hp*100)}%' for L, p in enumerate(player.party)])}")
 
-        for p in self.players:
-            if nick == p.name:
-                player = p
-        self.send_to(self.channel, f"{nick}'s team: {', '.join([f'{p}: {int(p._hp/p.max_hp*100)}%' for p in player.party])}")
     def battle(self, poke1, poke2):
         i = random.randrange(100)
         loser = None
@@ -651,8 +682,6 @@ class Client(object):
             type_effectiveness = 0.5
         elif defender.type in none:
             type_effectiveness = 0
-
-            
         move_type, power = move
         stab = 1
         if attacker.type == defender.type:
@@ -667,53 +696,89 @@ class Client(object):
         damage = int(((((2 * attacker.level) / 5 + 2) * power * (attack/defense))/50 + 2) * random_multiplier * stab * type_effectiveness)
         defender._hp -= damage
         defender._hp = max(defender._hp, 0)
-        print(f"{attacker} did {damage} damage to {defender} -- {defender._hp}")
+
+    def get_player(self, nick):
+        for p in self.players:
+            if nick.lower() == p.name.lower():
+                player = p
+                return player
+        return False
+    def get_pokemon(self, which_pokemon, player, has_to_be="Neither"):
+        pokemon = None
+        if which_pokemon.upper() in "ABCDEF":
+            if has_to_be == "PC":
+                raise BadCommand(f"PC pokemon are referred to by numerical numbers [0-...]")
+            which_pokemon = "ABCDEF".index(which_pokemon.upper())
+            which_container = player.party
+            pokemon = which_container[which_pokemon]
+            index = which_pokemon
+        
+        elif which_pokemon.isdigit():
+            if has_to_be == "party":
+                raise BadCommand(f"Party pokemon are referred to by letters [A-Z]")
+            which_container = player.stored
+            which_pokemon = int(which_pokemon)
+            try:
+                pokemon = which_container[which_pokemon]
+            except:
+                raise BadCommand(f"You do not have that many pokemon in your PC")
+            index = which_pokemon
+        else:
+            if has_to_be == "PC":
+                which_container = player.stored
+            else:
+                which_container = player.party
+            index = 0
+            for poke in which_container:
+                if which_pokemon.lower() == poke.name.lower():
+                    pokemon = poke
+                    break
+                index += 1
+        if not pokemon:
+            raise BadCommand(f"That is not a valid pokemon")
+        return index, which_container, pokemon
+
+
     def parse_go(self, nick, command):
         if nick not in self.player_list:
             raise BadCommand(f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
-        for p in self.players:
-            if nick == p.name:
-                player = p
-
-        if len(command) >= 2:
-            pokemon_name = command[1].lower()
-            pokemon = None
-            for p in player.party:
-                if pokemon_name == p.name.lower():
-                    pokemon = p
-            if not pokemon:
-                raise BadCommand(f"{nick}: That is not a pokemon in your party.")
-        else:
-            raise BadCommand(f"{nick}: Syntax: #go <pokemon> . Available: {' '.join(player.party)}")
         if not self.wild_pokemon:
-            raise BadCommand(f"{nick}: There is no wild pokemon around")
-        self.send_to(self.channel, f"{nick} has sent out {pokemon} against {self.wild_pokemon}")
+            raise BadCommand("There is no pokemon there!")
+        catch = False
+        player = self.get_player(nick)
+        which_pokemon = command[1].lower()
+        if len(command) > 2:
+            if command[2].lower() in ["catch", "c"]:
+                catch = True 
+
+        index, container, pokemon = self.get_pokemon(which_pokemon, player, has_to_be="party")
         loser = self.battle(pokemon, self.wild_pokemon)
-        self.send_to(self.channel, f"{pokemon} - {pokemon._hp}     {self.wild_pokemon} - {self.wild_pokemon._hp}")
         # TODO: get rid of this, it's just for debugging
         pokemon._hp = pokemon.max_hp
         if loser != pokemon:
-            #loser.captured = True
             exp = pokemon.gain_experience(loser)
             pokemon.gain_ev(loser)
             before_name = pokemon.name
             level = pokemon.check_level()
-                
-            
             message = f"{nick}'s {before_name} defeated the {self.wild_pokemon.name}. {before_name} gained {exp} EXP. "
             if level:
                 pokemon.level = level
                 message += f"{before_name} is now level {pokemon.level}. "
                 if pokemon.name != before_name:
                     message += f"{before_name} evolved into {pokemon.name}!"
-
-            #player.add_pokemon(loser)
-            #self.send_to(self.channel, f"{nick}'s {pokemon.name} defeated the {self.wild_pokemon.name} and captured it. {pokemon.name} gained {exp} EXP.")
-            self.send_to(self.channel, message)
-            #self.send_to(self.channel, f"{nick}'s {pokemon.name} defeated the {self.wild_pokemon.name} and captured it. {pokemon.name} gained {exp} EXP.")
             self.wild_pokemon = None
+            if catch:
+                loser.captured = True
+                player.add_pokemon(loser)
+                message += f" {loser} was caught!"
+            else:
+                self.fainted_pokemon = loser
+                loser.defeated_by = player
+            self.send_to(self.channel, message)
         else:
+            #TODO: make it so only the last trainer can't fight pokemon
             self.send_to(self.channel, f"{nick}'s {pokemon.name} lost the battle, and the {self.wild_pokemon.name} ran away!")
+            self.wild_pokemon = None
                 
     def parse_starter(self, nick, command):
         f_starters = " ".join(starters)
@@ -729,9 +794,10 @@ class Client(object):
         player.add_pokemon(starter)
         self.players.append(player)
         self.send_to(self.channel, f"Congratulations, your first pokemon is {starter}!")
-        pass
+
     def post_registration(self):
         self.join(self.channel)
+
     def make_next_wild_pokemon(self):
         boxes = []
         for p in self.players:
@@ -740,11 +806,9 @@ class Client(object):
         if not boxes:
             boxes = [5]
         which_box = random.choice(boxes)
-
         level = which_box + random.randrange(-5, 5)
         level = max(1, level)
         level = min(100, level)
-       
        # Rareness:
        # 0: 40% - Common Technically less rare but there are fewer in thsi category, making each species more common
        # 1: 50% - Average rareness
@@ -768,13 +832,13 @@ class Client(object):
             if evolution_level != 0 and evolution_level <= level:
                 continue
             else: break
-#        which_pokemon = random.choice(list(pokemon_dict.keys()))
         pokemon = Pokemon(species, level)
         return pokemon
 
-
     def loop(self):
+        self.repelling = False
         self.wild_pokemon = None
+        self.fainted_pokemon = None
         while True:
             self.now = int(time.time())
             if not self.next_pokemon_appearance:
@@ -782,9 +846,11 @@ class Client(object):
             elif self.now >= self.next_pokemon_appearance:
                 if self.wild_pokemon and not self.wild_pokemon.captured:
                     del self.wild_pokemon
-                self.wild_pokemon = self.make_next_wild_pokemon()
-                self.send_to(self.channel, f"A wild {self.wild_pokemon} appeared!")
-                self.next_pokemon_appearance = 0
+                if not self.repelling:
+                    self.fainted_pokemon = None
+                    self.wild_pokemon = self.make_next_wild_pokemon()
+                    self.send_to(self.channel, f"A wild {self.wild_pokemon} appeared!")
+                    self.next_pokemon_appearance = 0
             try:
                 data = self.socket.recv(1024)
             except:
@@ -804,19 +870,17 @@ class Client(object):
                 try:
                     self.handle_privmsg(data)
                 except BadCommand as e:
-                    print("YYYYYYYYYYYYY")
-                    print(e)
                     self.send_to(self.channel, str(e))
-            print(data)
-
-print("before")
+def create_database():
+    con = sqlite3.connect("pokemon.db")
+    cur = con.cursor()
+    cur.execute("""CREATE TABLE IF NOT EXISTS trainers (trainer_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, nick TEXT NOT NULL)""")
+    con.commit()
+create_database()
+sys.exit()
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    print("after")
-    print(s)
     a = s.connect((HOST, PORT))
     s.setblocking(False)
-    print(a)
-
     client = Client(s, "#pokemon")
     client.connect()
     client.loop()
