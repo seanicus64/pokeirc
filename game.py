@@ -66,7 +66,7 @@ starters = (
     "nidoran_m",
     "nidoran_f",
     "abra",
-    "ghastly",
+    "gastly",
     "machop",
     "geodude",
     "dratini",
@@ -294,12 +294,14 @@ s = sorted(a, key=lambda x: x[1])
 class Channel(object):
     def __init__(self, name):
         self.name = name
-        self.next_wild = 30
+        self.next_wild = random.randrange(100, 150)
         self.current_privmsg = 0
         self.fainted_pokemon = None
         self.wild_pokemon = None
     def increment_privmsg(self):
         self.current_privmsg += 1
+    def __repr__(self):
+        return self.name
 
 class BadChanCommand(Exception):
     def __init__(self, channel, text):
@@ -524,7 +526,10 @@ class Client(object):
         self.players = []
         self.channels = []
         for c in channels:
+            print(f"c is {c}")
             self.channels.append(Channel(c))
+        print("the channels are")
+        print(self.channels)
         self.channel = channel
         if not os.path.exists("pokemon.db"):
             self.create_database()
@@ -553,6 +558,8 @@ class Client(object):
         self.send("NICK ProfOak")
     def join(self, channel):
         message = f"JOIN {channel}"
+        print("JOINING CHANNEL")
+        print(message)
         self.send(message)
     
     def send(self, message):
@@ -887,6 +894,8 @@ class Client(object):
             pokemon.gain_ev(loser)
             before_name = pokemon.name
             level = pokemon.check_level()
+            #TODO: until a better hp system is set up
+            pokemon._hp = pokemon.max_hp
             self.sql_update_pokemon(pokemon)
             message = f"{nick}'s {before_name} defeated the {channel.wild_pokemon.name}. {before_name} gained {exp} EXP. "
             if level:
@@ -966,7 +975,8 @@ class Client(object):
 
     def post_registration(self):
         for c in self.channels:
-            self.join(self.channel)
+            print("KKKKKKKKKK", c)
+            self.join(c.name)
 
     def make_next_wild_pokemon(self):
         boxes = []
