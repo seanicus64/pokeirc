@@ -75,159 +75,159 @@ starters = (
 
 pokemon_dict = {
     # name              idx     type         rare,grth,bexp     hp  att def satt sdef spd      evolution    lvl
-    "Bulbasaur":        (1,     "grass",        1,2,64,         (45, 49, 49,  65,  65, 45),  ("Ivysaur",     16)),
-    #"Bulbasaur":        (1,     "grass",        1,2,64,         (45, 49, 49,  65,  65, 45),  ("Ivysaur",     8)),
-    "Ivysaur":          (2,     "grass",        1,2,141,        (60, 62, 63,  80,  80, 60),  ("Venusaur",     32)),
-    #"Ivysaur":          (2,     "grass",        1,2,141,        (60, 62, 63,  80,  80, 60),  ("Venusaur",     12)),
-    "Venusaur":         (3,     "grass",        1,2,208,        (80, 82, 83, 100, 100, 80),  ("XXXXXXX",     0)),
-    "Charmander":       (4,     "fire",         1,2,65,         (39, 52, 43, 60, 50, 65),  ("Charmeleon",     16)),
-    "Charmeleon":        (5,     "fire",         1,2,142,        (58, 64, 58, 80, 65, 80),  ("Charizard",     36)),
-    "Charizard":        (6,     "fire",         1,2,209,        (78, 84, 78, 109, 85, 100),  ("XXXXXXX",     0)),
-    "Squirtle":         (7,     "water",        1,2,66,         (44, 48, 65, 50, 64, 43),  ("Wartortle",     16)),
-    "Wartortle":        (8,     "water",        1,2,143,        (59, 63, 80, 65, 80, 58),  ("Blastoise",     36)),
-    "Blastoise":        (9,     "water",        1,2,210,        (79, 83, 100, 85, 105, 78),  ("XXXXXXX",     0)),
-    "Caterpie":         (10,     "bug",         0,1,53,         (45, 30, 35, 20, 20, 45),  ("Metapod",     7)),
-    "Metapod":          (11,     "bug",         0,1,72,         (50, 20, 55, 25, 25, 30),  ("Butterfree",    10)),
-    "Butterfree":       (12,     "bug",         0,1,160,        (60, 45, 50, 90, 80, 70),  ("XXXXXXX",     0)),
-    "Weedle":           (13,     "bug",         0,1,52,         (40, 35, 30, 20, 20, 50),  ("Kakuna",     7)),
-    "Kakuna":           (15,     "bug",         0,1,71,         (45, 25, 50, 25, 25, 35),  ("Beedrill",     10)),
-    "Beedrill":         (15,     "bug",         0,1,159,        (65, 90, 40, 45, 80, 75),  ("XXXXXXX",     0)),
-    "Pidgey":           (16,     "flying",      0,2,55,         (40, 45, 40, 35, 35, 56),  ("Pidgeotto",     18)),
-    "Pidgeotto":        (17,     "flying",      0,2,113,        (63, 60, 55, 50, 50, 71),  ("Pidgeot",     36)),
-    "Pidgeot":          (18,     "flying",      0,2,172,        (83, 80, 75, 70, 70, 101),  ("XXXXXXX",     0)),
-    "Rattata":          (19,     "normal",      0,1,57,         (30, 56, 35, 25, 35, 72),  ("Radicate",     20)),
-    "Raticate":         (20,     "normal",      0,1,116,        (55, 81, 60, 50, 70, 97),  ("XXXXXXX",     0)),
-    "Spearow":          (21,     "flying",      0,1,58,         (40, 60, 30, 31, 31, 70),  ("Fearow",     20)),
-    "Fearow":           (22,     "flying",      0,1,162,        (65, 90, 65, 61, 61, 100),  ("XXXXXXX",     0)),
-    "Ekans":            (23,     "poison",      1,1,62,         (35, 60, 44, 40, 54, 55),  ("Arbok",     22)),
-    "Arbok":            (24,     "poison",      1,1,147,        (60, 95, 69, 65, 79, 80),  ("XXXXXXX",     0)),
-    "Pikachu":          (25,     "electric",    2,1,82,         (35, 55, 40, 50, 50, 90),  ("Raichu",     22)), # added
-    "Raichu":           (26,     "electric",    2,1,122,        (60, 90, 55, 90, 80, 110),  ("XXXXXXX",     0)),
-    "Sandshrew":        (27,     "ground",      1,1,93,         (50, 75, 85, 20, 30, 40),  ("Sandslash",     22)),
-    "Sandslash":        (28,     "ground",      1,1,163,        (75, 100, 110, 45, 55, 65),  ("XXXXXXX",     0)),
-    "Nidoran_f":        (29,     "poison",      0,2,59,         (55, 47, 52, 40, 40, 41),  ("Nidorina",     16)),
-    "Nidorina":         (30,     "poison",      0,2,117,        (70, 62, 67, 55, 55, 56),  ("Nidoqueen",     35)), # added
-    "Nidoqueen":        (31,     "poison",      0,2,194,        (90, 92, 87, 75, 85, 76),  ("XXXXXXX",     0)),
-    "Nidoran_m":        (32,     "poison",      0,2,60,         (46, 57, 40, 40, 40, 50),  ("Nidorino",     16)),
-    "Nidorino":         (33,     "poison",      0,2,118,        (61, 72, 57, 55, 55, 65),  ("Nidoking",     35)), # added
-    "Nidoking":         (34,     "poison",      0,2,195,        (81, 102, 77, 85, 75, 85),  ("XXXXXXX",     0)),
-    "Clefairy":         (35,     "normal",      2,0,68,         (70, 45, 48, 60, 65, 35),  ("Clefable",     30)), # added
-    "Clefable":         (36,     "normal",      2,0,129,        (95, 70, 73, 95, 90, 60),  ("XXXXXXX",     0)),
-    "Vulpix":           (37,     "fire",        1,1,63,         (38, 41, 40, 50, 65, 65),  ("Ninetails",     30)), # added
-    "Ninetails":        (38,     "fire",        1,1,178,        (73, 76, 75, 81, 100, 100),  ("XXXXXXX",     0)),
-    "Jigglypuff":       (39,     "normal",      2,0,76,         (115, 45, 20, 45, 25, 20),  ("Wigglytuff",     30)), # added
-    "Wigglytuff":       (40,     "normal",      2,0,109,        (140, 70, 45, 85, 50, 45),  ("XXXXXXX",     0)),
-    "Zubat":            (41,     "poison",      0,1,54,         (40,  45, 35, 30, 40, 55),  ("Golbat",     22)),
-    "Golbat":           (42,     "poison",      0,1,171,        (75, 80, 70, 65, 75, 90),  ("XXXXXXX",     0)),
-    "Oddish":           (43,     "grass",       0,2,78,         (45, 50, 55, 75, 65, 30),  ("Gloom",     21)),
-    "Gloom":            (44,     "grass",       0,2,132,        (60, 65, 70, 85, 75, 40),  ("Vileplume",     40)), # added
-    "Vileplume":        (45,     "grass",       0,2,184,        (75, 80, 85, 110, 90, 50),  ("XXXXXXX",     0)),
-    "Paras":            (46,     "bug",         1,1,70,         (35, 70, 55, 45, 55, 25),  ("Parasect",     24)),
-    "Parasect":         (47,     "bug",         1,1,128,        (60, 95, 80, 60, 80, 30),  ("XXXXXXX",     0)),
-    "Venonat":          (48,     "bug",         1,1,75,         (60, 55, 50, 40, 55, 45),  ("Venomoth",     31)),
-    "Venomoth":         (49,     "bug",         1,1,138,        (70, 65, 60, 90, 75, 90),  ("XXXXXXX",     0)),
-    "Diglett":          (50,     "ground",      0,1,81,         (10, 55, 25, 35, 45, 95),  ("Dugtrio",     26)),
-    "Dugtrio":          (51,     "ground",      0,1,153,        (35, 100, 50, 50, 70, 120),  ("XXXXXXX",     0)),
-    "Meowth":           (52,     "normal",      1,1,69,         (40, 45, 35, 40, 40, 90),  ("Persian",     28)),
-    "Persian":          (53,     "normal",      1,1,148,        (65, 70, 60, 65, 65, 115),  ("XXXXXXX",     0)),
-    "Psyduck":          (54,     "water",       1,1,80,         (50, 52, 48, 65, 50, 55),  ("Golduck",     33)),
-    "Golduck":          (55,     "water",       1,1,174,        (80, 82, 78, 95, 80, 85),  ("XXXXXXX",     0)),
-    "Mankey":           (56,     "fighting",    1,1,74,         (40, 80, 35, 35, 45, 70),  ("Primeape",     28)),
-    "Primeape":         (57,     "fighting",    1,1,149,        (65, 105, 60, 60, 70, 85),  ("XXXXXXX",     0)),
-    "Growlithe":        (58,     "fire",        1,3,91,         (55, 70, 45, 70, 50, 60),  ("Arcanine",     30)), # added
-    "Arcanine":         (59,     "fire",        1,3,213,        (90, 110, 80, 100, 80, 95),  ("XXXXXXX",     0)),
-    "Poliwag":          (60,     "water",       1,2,77,         (40, 50, 40, 40, 40, 90),  ("Poliwhirl",     25)),
-    "Poliwhirl":        (61,     "water",       1,2,131,        (65, 65, 65, 50, 50, 90),  ("Poliwrath",     40)), #added
-    "Poliwrath":        (62,     "water",       1,2,185,        (90, 95, 95, 70, 90, 70),  ("XXXXXXX",     0)),
-    "Abra":             (63,     "psychic",     1,2,73,         (25, 20, 15, 105, 55, 90),  ("Kadabra",     16)),
-    "Kadabra":          (64,     "psychic",     1,2,145,        (40, 35, 30, 120, 70, 105),  ("Alakazam",     40)), #added
-    "Alakazam":         (65,     "psychic",     1,2,186,        (55, 50, 45, 135, 95, 120),  ("XXXXXXX",     0)),
-    "Machop":           (66,     "fighting",    1,2,88,         (70, 80, 50, 35, 35, 35),  ("Machoke",     28)),
-    "Machoke":          (67,     "fighting",    1,2,146,        (80, 100, 70, 50, 60, 45),  ("Machamp",     40)), #added
-    "Machamp":          (68,     "fighting",    1,2,193,        (90, 130, 80, 65, 85, 55),  ("XXXXXXX",     0)),
-    "Bellsprout":       (69,     "grass",       1,2,84,         (50, 75, 35, 70, 30, 40),  ("Weepinbell",     21)),
-    "Weepinbell":       (70,     "grass",       1,2,151,        (65, 90, 50, 85, 45, 55),  ("Victreebell",     40)), #added
-    "Victreebel":       (71,     "grass",       1,2,191,        (80, 105, 65, 100, 70, 70),  ("XXXXXXX",     0)),
-    "Tentacool":        (72,     "grass",       1,3,105,        (40, 40, 35, 50, 100, 70),  ("Tentacruel",     30)),
-    "Tentacruel":       (73,     "grass",       1,3,205,        (80, 70, 65, 80, 120, 100),  ("XXXXXXX",     0)),
-    "Geodude":          (74,     "rock",        1,2,86,         (40, 80, 100, 30, 30, 20),  ("Graveler",     25)),
-    "Graveler":         (75,     "rock",        1,2,134,        (55, 95, 115, 45, 45, 35),  ("Golem",     45)), #added
-    "Golem":            (76,     "rock",        1,2,177,        (80, 120, 130, 55, 65, 45),  ("XXXXXXX",     0)),
-    "Ponyta":           (77,     "fire",        1,1,152,        (50, 85, 55, 65, 65, 90),  ("Rapidash",     40)),
-    "Rapidash":         (78,     "fire",        1,1,192,        (65, 100, 70, 80, 80, 105),  ("XXXXXXX",     0)),
-    "Slowpoke":         (79,     "water",       1,1,99,         (90, 65, 65, 40, 40, 15),  ("Slowbro",     37)),
-    "Slowbro":          (80,     "water",       1,1,164,        (95, 75, 110, 100, 80, 30),  ("XXXXXXX",     0)),
-    "Magnemite":        (81,     "electric",    1,1,89,         (25, 35, 70, 95, 55, 45),  ("Magneton",     30)),
-    "Magneton":         (82,     "electric",    1,1,161,        (50, 60, 95, 120, 70, 70),  ("XXXXXXX",     0)),
-    "Farfetch'd":       (83,     "flying",      2,1,94,         (52, 90, 55, 58, 62, 60),  ("XXXXXXX",     0)),
-    "Doduo":            (84,     "flying",      1,1,96,         (35, 85, 45, 35, 35, 75),  ("Dodrio",     31)),
-    "Dodrio":           (85,     "flying",      1,1,158,        (60, 110, 70, 60, 60, 110),  ("XXXXXXX",     0)),
-    "Seel":             (86,     "water",       1,1,100,        (65, 45, 55, 45, 70, 45),  ("Dewgong",     34)),
-    "Dewgong":          (87,     "water",       1,1,176,        (90, 70, 80, 70, 95, 70),  ("XXXXXXX",     0)),
-    "Grimer":           (88,     "poison",      1,1,90,         (80, 80, 50, 40, 50, 25),  ("Muk",     38)),
-    "Muk":              (89,     "poison",      1,1,157,        (105, 105, 75, 65, 100, 50),  ("XXXXXXX",     0)),
-    "Shellder":         (90,     "water",       1,3,97,         (30, 65, 100, 45, 25, 40),  ("Cloyster",    30)), #added
-    "Cloyster":         (91,     "water",       1,3,203,        (50, 95, 180, 85, 45, 70),  ("XXXXXXX",     0)),
-    "Gastly":           (92,     "ghost",       1,2,95,         (30, 35, 30, 100, 35, 80),  ("Haunter",     25)),
-    "Haunter":          (93,     "ghost",       1,2,126,        (45, 50, 45, 115, 55, 95),  ("Gengar",     50)), #added
-    "Gengar":           (94,     "ghost",       1,2,190,        (60, 65, 60, 130, 75, 110),  ("XXXXXXX",     0)),
-    "Onix":             (95,     "rock",        2,1,108,        (35, 45, 160, 30, 45, 70),  ("XXXXXXX",     0)),
-    "Drowzee":          (96,     "psychic",     1,1,102,        (60, 48, 45, 43, 90, 42),  ("Hypno",     26)),
-    "Hypno":            (97,     "psychic",     1,1,165,        (85, 73, 70, 73, 115, 67),  ("XXXXXXX",     0)),
-    "Krabby":           (98,     "water",       1,1,115,        (30, 105, 90, 25, 25, 50),  ("Kingler",     28)),
-    "Kingler":          (99,     "water",       1,1,206,        (55, 10, 115, 50, 50, 75),  ("XXXXXXX",     0)),
-    "Voltorb":          (100,     "electric",   1,1,103,        (40, 30, 50, 55, 55, 100),  ("Electrode",     30)),
-    "Electrode":        (101,     "electric",   1,1,150,        (60, 50, 70, 80, 80, 150),  ("XXXXXXX",     0)),
-    "Exeggcute":        (102,     "grass",      2,3,98,         (60, 40, 80, 60, 45, 40),  ("Exeggutor",     40)), #added
-    "Exeggutor":        (103,     "grass",      2,3,212,        (95, 95, 85, 125, 75, 55),  ("XXXXXXX",     0)),
-    "Cubone":           (104,     "ground",     1,1,87,         (50, 50, 95, 40, 50, 35),  ("Marowak",     28)),
-    "Marowak":          (105,     "ground",     1,1,124,        (60, 80, 110, 50, 80, 45),  ("XXXXXXX",     0)),
-    "Hitmonlee":        (106,     "fighting",   2,1,139,        (50, 120, 53, 35, 110, 87),  ("XXXXXXX",     0)),
-    "Hitmonchan":       (107,     "fighting",   2,1,140,        (50, 105, 79, 35, 110, 76),  ("XXXXXXX",     0)),
-    "Licktung":         (108,     "normal",     2,1,127,        (90, 55, 75, 60, 75, 30),  ("XXXXXXX",     0)),
-    "Koffing":          (109,     "poison",     1,1,114,        (40, 65, 95, 60, 45, 35),  ("Weezing",     35)),
-    "Weezing":          (110,     "poison",     1,1,173,        (65, 90, 120, 85, 70, 60),  ("XXXXXXX",     0)),
-    "Rhyhorn":          (111,     "rock",       1,3,135,        (80, 85, 95, 30, 30, 25),  ("Rhydon",     42)),
-    "Rhydon":           (112,     "rock",       1,3,204,        (105, 130, 120, 45, 45, 40),  ("XXXXXXX",     0)),
-    "Chansey":          (113,     "normal",     2,0,255,        (250, 5, 5, 35, 105, 50),  ("XXXXXXX",     0)),
-    "Tangela":          (114,     "grass",      1,1,166,        (65, 55, 115, 100, 40, 60),  ("XXXXXXX",     0)),
-    "Kangaskhan":       (115,     "normal",     2,1,175,        (105, 95, 80, 40, 80, 90),  ("XXXXXXX",     0)),
-    "Horsea":           (116,     "water",      1,1,83,         (30, 40, 70, 70, 25, 60),  ("Seadra",     32)),
-    "Seadra":           (117,     "water",      1,1,155,        (55, 65, 95, 95, 45, 85),  ("XXXXXXX",     0)),
-    "Goldeen":          (118,     "water",      1,1,111,        (45, 67, 60, 35, 50, 63),  ("Seaking",     33)),
-    "Seaking":          (119,     "water",      1,1,170,        (80, 92, 65, 65, 80, 68),  ("XXXXXXX",     0)),
-    "Staryu":           (120,     "water",      1,3,106,        (30, 45, 55, 70, 55, 85),  ("Starmie",     30)), #added
-    "Starmie":          (121,     "water",      1,3,207,        (60, 75, 85, 100, 85, 115),  ("XXXXXXX",     0)),
-    "Mr_mime":          (122,     "psychic",    2,1,136,        (40, 45, 65, 100, 120, 90),  ("XXXXXXX",     0)),
-    "Scyther":         (123,     "bug",         2,1,187,        (70, 110, 80, 55, 80, 105),  ("XXXXXXX",     0)),
-    "Jynx":             (124,     "psychic",    2,1,137,        (65, 50, 35, 15, 95, 95),  ("XXXXXXX",     0)),
-    "Electabuzz":        (125,     "electric",  2,1,156,        (65, 83, 57, 95, 85, 105),  ("XXXXXXX",     0)),
-    "Magmar":           (126,     "fire",       2,1,167,        (65, 95, 57, 100, 85, 93),  ("XXXXXXX",     0)),
-    "Pinsir":           (127,     "bug",        2,3,200,        (65, 125, 100, 55, 70, 85),  ("XXXXXXX",     0)),
-    "Tauros":           (128,     "normal",     2,3,211,        (75, 100, 95, 40, 80, 110),  ("XXXXXXX",     0)),
-    "Magikarp":         (129,     "water",      1,3,20,         (20, 10, 55, 15, 20, 80),  ("Gyarados",     20)),
-    "Gyarados":         (130,     "water",      2,3,214,        (95, 125, 79, 60, 100, 81),  ("XXXXXXX",     0)),
-    "Lapras":           (131,     "water",      2,3,219,        (130, 85, 80, 85, 95, 60),  ("XXXXXXX",     0)),
-    "Ditto":            (132,     "normal",     2,1,61,         (48, 48, 48, 48, 48, 48),  ("XXXXXXX",     0)),
-    "Eevee":            (133,     "normal",     2,1,92,         (55, 55, 50, 45, 65, 55),  ("Vaporeon",     30)), #added
-    "Vaporeon":         (134,     "grass",      2,1,196,        (130, 65, 60, 110, 95, 65),  ("XXXXXXX",     0)),
-    "Jolteon":          (135,     "electric",   2,1,197,        (65, 65, 60, 110, 95, 130),  ("XXXXXXX",     0)),
-    "Flareon":          (136,     "fire",       2,1,198,        (65, 130, 60, 95, 110, 65),  ("XXXXXXX",     0)),
-    "Porygon":          (137,     "normal",     2,1,130,        (65, 60, 70, 85, 75, 40),  ("XXXXXXX",     0)),
-    "Omanyte":          (138,     "water",      2,1,120,        (35, 40, 100, 90, 55, 35),  ("Omastar",     40)),
-    "Omastar":          (139,     "water",      2,1,199,        (70, 60, 125, 115, 70, 55),  ("XXXXXXX",     0)),
-    "Kabuto":           (140,     "water",      2,1,119,        (30, 80, 90, 55, 45, 55),  ("Kabutops",     40)),
-    "Kabutops":         (141,     "water",      2,1,201,        (60, 115, 105, 65, 70, 80),  ("XXXXXXX",     0)),
-    "Aerodactyl":       (142,     "flying",     2,3,202,        (80, 105, 65, 60, 75, 130),  ("XXXXXXX",     0)),
-    "Snorlax":          (143,     "normal",     2,3,154,        (160, 110, 65, 65, 110, 30),  ("XXXXXXX",     0)),
-    "Articuno":         (144,     "flying",     3,3,215,        (90, 85, 100, 95, 125, 85),  ("XXXXXXX",     0)),
-    "Zapdos":           (145,     "electric",   3,3,216,        (90, 90, 85, 125, 90, 100),  ("XXXXXXX",     0)),
-    "Moltres":          (146,     "flying",     3,3,217,        (90, 100, 90, 125, 85, 90),  ("XXXXXXX",     0)),
-    "Dratini":          (147,     "dragon",     2,3,67,         (41, 64, 45, 50, 50, 50),  ("Dragonair",     30)),
-    "Dragonair":        (148,     "dragon",     2,3,144,        (61, 84, 65, 70, 70, 70),  ("Dragonite",     55)),
-    "Dragonite":        (149,     "dragon",     2,3,218,        (91, 135, 95, 100, 100, 80),  ("XXXXXXX",     0)),
-    "Mewtwo":           (150,     "psychic",    3,3,220,        (106, 110, 90, 154, 90, 130),  ("XXXXXXX",     0)),
-    "Mew":              (151,     "psychic",    3,2,64,         (100, 100, 100, 100, 100, 100),  ("XXXXXXX",     0)),
+    "Bulbasaur":        (1,     "grass",        1,2,64,         (45, 49, 49,  65,  65, 45),  ("Ivysaur",     16),    8),
+    #"Bulbasaur":        (1,     "grass",        1,2,64,         (45, 49, 49,  65,  65, 45),  ("Ivysaur",     8),    10),
+    "Ivysaur":          (2,     "grass",        1,2,141,        (60, 62, 63,  80,  80, 60),  ("Venusaur",     32),   16),
+    #"Ivysaur":          (2,     "grass",        1,2,141,        (60, 62, 63,  80,  80, 60),  ("Venusaur",     12),  16),
+    "Venusaur":         (3,     "grass",        1,2,208,        (80, 82, 83, 100, 100, 80),  ("XXXXXXX",     0),     32),
+    "Charmander":       (4,     "fire",         1,2,65,         (39, 52, 43, 60, 50, 65),  ("Charmeleon",     16),   8),
+    "Charmeleon":        (5,     "fire",         1,2,142,        (58, 64, 58, 80, 65, 80),  ("Charizard",     36),   16),
+    "Charizard":        (6,     "fire",         1,2,209,        (78, 84, 78, 109, 85, 100),  ("XXXXXXX",     0),     32),
+    "Squirtle":         (7,     "water",        1,2,66,         (44, 48, 65, 50, 64, 43),  ("Wartortle",     16),    8),
+    "Wartortle":        (8,     "water",        1,2,143,        (59, 63, 80, 65, 80, 58),  ("Blastoise",     36),    16),
+    "Blastoise":        (9,     "water",        1,2,210,        (79, 83, 100, 85, 105, 78),  ("XXXXXXX",     0),     32),
+    "Caterpie":         (10,     "bug",         0,1,53,         (45, 30, 35, 20, 20, 45),  ("Metapod",     7),       2),
+    "Metapod":          (11,     "bug",         0,1,72,         (50, 20, 55, 25, 25, 30),  ("Butterfree",    10),    7),
+    "Butterfree":       (12,     "bug",         0,1,160,        (60, 45, 50, 90, 80, 70),  ("XXXXXXX",     0),       10),
+    "Weedle":           (13,     "bug",         0,1,52,         (40, 35, 30, 20, 20, 50),  ("Kakuna",     7),        2),
+    "Kakuna":           (15,     "bug",         0,1,71,         (45, 25, 50, 25, 25, 35),  ("Beedrill",     10),     7),
+    "Beedrill":         (15,     "bug",         0,1,159,        (65, 90, 40, 45, 80, 75),  ("XXXXXXX",     0),       10),
+    "Pidgey":           (16,     "flying",      0,2,55,         (40, 45, 40, 35, 35, 56),  ("Pidgeotto",     18),    2),
+    "Pidgeotto":        (17,     "flying",      0,2,113,        (63, 60, 55, 50, 50, 71),  ("Pidgeot",     36),      18),
+    "Pidgeot":          (18,     "flying",      0,2,172,        (83, 80, 75, 70, 70, 101),  ("XXXXXXX",     0),      36),
+    "Rattata":          (19,     "normal",      0,1,57,         (30, 56, 35, 25, 35, 72),  ("Raticate",     20),     2),
+    "Raticate":         (20,     "normal",      0,1,116,        (55, 81, 60, 50, 70, 97),  ("XXXXXXX",     0),       20),
+    "Spearow":          (21,     "flying",      0,1,58,         (40, 60, 30, 31, 31, 70),  ("Fearow",     20),       2),
+    "Fearow":           (22,     "flying",      0,1,162,        (65, 90, 65, 61, 61, 100),  ("XXXXXXX",     0),      20),
+    "Ekans":            (23,     "poison",      1,1,62,         (35, 60, 44, 40, 54, 55),  ("Arbok",     22),        3),
+    "Arbok":            (24,     "poison",      1,1,147,        (60, 95, 69, 65, 79, 80),  ("XXXXXXX",     0),       22),
+    "Pikachu":          (25,     "electric",    2,1,82,         (35, 55, 40, 50, 50, 90),  ("Raichu",     22),       8), # added
+    "Raichu":           (26,     "electric",    2,1,122,        (60, 90, 55, 90, 80, 110),  ("XXXXXXX",     0),      22),
+    "Sandshrew":        (27,     "ground",      1,1,93,         (50, 75, 85, 20, 30, 40),  ("Sandslash",     22),    4),
+    "Sandslash":        (28,     "ground",      1,1,163,        (75, 100, 110, 45, 55, 65),  ("XXXXXXX",     0),     22),
+    "Nidoran_f":        (29,     "poison",      0,2,59,         (55, 47, 52, 40, 40, 41),  ("Nidorina",     16),     3),
+    "Nidorina":         (30,     "poison",      0,2,117,        (70, 62, 67, 55, 55, 56),  ("Nidoqueen",     35),    16), # added
+    "Nidoqueen":        (31,     "poison",      0,2,194,        (90, 92, 87, 75, 85, 76),  ("XXXXXXX",     0),       35),
+    "Nidoran_m":        (32,     "poison",      0,2,60,         (46, 57, 40, 40, 40, 50),  ("Nidorino",     16),     3),
+    "Nidorino":         (33,     "poison",      0,2,118,        (61, 72, 57, 55, 55, 65),  ("Nidoking",     35),     16), # added
+    "Nidoking":         (34,     "poison",      0,2,195,        (81, 102, 77, 85, 75, 85),  ("XXXXXXX",     0),      35),
+    "Clefairy":         (35,     "normal",      2,0,68,         (70, 45, 48, 60, 65, 35),  ("Clefable",     30),     5), # added
+    "Clefable":         (36,     "normal",      2,0,129,        (95, 70, 73, 95, 90, 60),  ("XXXXXXX",     0),       30),
+    "Vulpix":           (37,     "fire",        1,1,63,         (38, 41, 40, 50, 65, 65),  ("Ninetails",     30),    5), # added
+    "Ninetails":        (38,     "fire",        1,1,178,        (73, 76, 75, 81, 100, 100),  ("XXXXXXX",     0),     30),
+    "Jigglypuff":       (39,     "normal",      2,0,76,         (115, 45, 20, 45, 25, 20),  ("Wigglytuff",     30),  5), # added
+    "Wigglytuff":       (40,     "normal",      2,0,109,        (140, 70, 45, 85, 50, 45),  ("XXXXXXX",     0),      30),
+    "Zubat":            (41,     "poison",      0,1,54,         (40,  45, 35, 30, 40, 55),  ("Golbat",     22),      5),
+    "Golbat":           (42,     "poison",      0,1,171,        (75, 80, 70, 65, 75, 90),  ("XXXXXXX",     0),       22),
+    "Oddish":           (43,     "grass",       0,2,78,         (45, 50, 55, 75, 65, 30),  ("Gloom",     21),        5),
+    "Gloom":            (44,     "grass",       0,2,132,        (60, 65, 70, 85, 75, 40),  ("Vileplume",     40),    21), # added
+    "Vileplume":        (45,     "grass",       0,2,184,        (75, 80, 85, 110, 90, 50),  ("XXXXXXX",     0),      40),
+    "Paras":            (46,     "bug",         1,1,70,         (35, 70, 55, 45, 55, 25),  ("Parasect",     24),     5),
+    "Parasect":         (47,     "bug",         1,1,128,        (60, 95, 80, 60, 80, 30),  ("XXXXXXX",     0),       24),
+    "Venonat":          (48,     "bug",         1,1,75,         (60, 55, 50, 40, 55, 45),  ("Venomoth",     31),     5),
+    "Venomoth":         (49,     "bug",         1,1,138,        (70, 65, 60, 90, 75, 90),  ("XXXXXXX",     0),       31),
+    "Diglett":          (50,     "ground",      0,1,81,         (10, 55, 25, 35, 45, 95),  ("Dugtrio",     26),      6),
+    "Dugtrio":          (51,     "ground",      0,1,153,        (35, 100, 50, 50, 70, 120),  ("XXXXXXX",     0),     26),
+    "Meowth":           (52,     "normal",      1,1,69,         (40, 45, 35, 40, 40, 90),  ("Persian",     28),      8),
+    "Persian":          (53,     "normal",      1,1,148,        (65, 70, 60, 65, 65, 115),  ("XXXXXXX",     0),      28),
+    "Psyduck":          (54,     "water",       1,1,80,         (50, 52, 48, 65, 50, 55),  ("Golduck",     33),      10),
+    "Golduck":          (55,     "water",       1,1,174,        (80, 82, 78, 95, 80, 85),  ("XXXXXXX",     0),       33),
+    "Mankey":           (56,     "fighting",    1,1,74,         (40, 80, 35, 35, 45, 70),  ("Primeape",     28),     8),
+    "Primeape":         (57,     "fighting",    1,1,149,        (65, 105, 60, 60, 70, 85),  ("XXXXXXX",     0),      28),
+    "Growlithe":        (58,     "fire",        1,3,91,         (55, 70, 45, 70, 50, 60),  ("Arcanine",     30),     10), # added
+    "Arcanine":         (59,     "fire",        1,3,213,        (90, 110, 80, 100, 80, 95),  ("XXXXXXX",     0),     30),
+    "Poliwag":          (60,     "water",       1,2,77,         (40, 50, 40, 40, 40, 90),  ("Poliwhirl",     25),    8),
+    "Poliwhirl":        (61,     "water",       1,2,131,        (65, 65, 65, 50, 50, 90),  ("Poliwrath",     40),    25), #added
+    "Poliwrath":        (62,     "water",       1,2,185,        (90, 95, 95, 70, 90, 70),  ("XXXXXXX",     0),       40),
+    "Abra":             (63,     "psychic",     1,2,73,         (25, 20, 15, 105, 55, 90),  ("Kadabra",     16),     8),
+    "Kadabra":          (64,     "psychic",     1,2,145,        (40, 35, 30, 120, 70, 105),  ("Alakazam",     40),   16), #added
+    "Alakazam":         (65,     "psychic",     1,2,186,        (55, 50, 45, 135, 95, 120),  ("XXXXXXX",     0),     40),
+    "Machop":           (66,     "fighting",    1,2,88,         (70, 80, 50, 35, 35, 35),  ("Machoke",     28),      8),
+    "Machoke":          (67,     "fighting",    1,2,146,        (80, 100, 70, 50, 60, 45),  ("Machamp",     40),     28), #added
+    "Machamp":          (68,     "fighting",    1,2,193,        (90, 130, 80, 65, 85, 55),  ("XXXXXXX",     0),      40),
+    "Bellsprout":       (69,     "grass",       1,2,84,         (50, 75, 35, 70, 30, 40),  ("Weepinbell",     21),   8),
+    "Weepinbell":       (70,     "grass",       1,2,151,        (65, 90, 50, 85, 45, 55),  ("Victreebell",     40),  21), #added
+    "Victreebel":       (71,     "grass",       1,2,191,        (80, 105, 65, 100, 70, 70),  ("XXXXXXX",     0),     40),
+    "Tentacool":        (72,     "grass",       1,3,105,        (40, 40, 35, 50, 100, 70),  ("Tentacruel",     30),  10),
+    "Tentacruel":       (73,     "grass",       1,3,205,        (80, 70, 65, 80, 120, 100),  ("XXXXXXX",     0),     30),
+    "Geodude":          (74,     "rock",        1,2,86,         (40, 80, 100, 30, 30, 20),  ("Graveler",     25),    9),
+    "Graveler":         (75,     "rock",        1,2,134,        (55, 95, 115, 45, 45, 35),  ("Golem",     45),       25), #added
+    "Golem":            (76,     "rock",        1,2,177,        (80, 120, 130, 55, 65, 45),  ("XXXXXXX",     0),     45),
+    "Ponyta":           (77,     "fire",        1,1,152,        (50, 85, 55, 65, 65, 90),  ("Rapidash",     40),     12),
+    "Rapidash":         (78,     "fire",        1,1,192,        (65, 100, 70, 80, 80, 105),  ("XXXXXXX",     0),     40),
+    "Slowpoke":         (79,     "water",       1,1,99,         (90, 65, 65, 40, 40, 15),  ("Slowbro",     37),      12),
+    "Slowbro":          (80,     "water",       1,1,164,        (95, 75, 110, 100, 80, 30),  ("XXXXXXX",     0),     37),
+    "Magnemite":        (81,     "electric",    1,1,89,         (25, 35, 70, 95, 55, 45),  ("Magneton",     30),     12),
+    "Magneton":         (82,     "electric",    1,1,161,        (50, 60, 95, 120, 70, 70),  ("XXXXXXX",     0),      30),
+    "Farfetch'd":       (83,     "flying",      2,1,94,         (52, 90, 55, 58, 62, 60),  ("XXXXXXX",     0),       12),
+    "Doduo":            (84,     "flying",      1,1,96,         (35, 85, 45, 35, 35, 75),  ("Dodrio",     31),       12),
+    "Dodrio":           (85,     "flying",      1,1,158,        (60, 110, 70, 60, 60, 110),  ("XXXXXXX",     0),     31),
+    "Seel":             (86,     "water",       1,1,100,        (65, 45, 55, 45, 70, 45),  ("Dewgong",     34),      12),
+    "Dewgong":          (87,     "water",       1,1,176,        (90, 70, 80, 70, 95, 70),  ("XXXXXXX",     0),       34),
+    "Grimer":           (88,     "poison",      1,1,90,         (80, 80, 50, 40, 50, 25),  ("Muk",     38),          20),
+    "Muk":              (89,     "poison",      1,1,157,        (105, 105, 75, 65, 100, 50),  ("XXXXXXX",     0),    38),
+    "Shellder":         (90,     "water",       1,3,97,         (30, 65, 100, 45, 25, 40),  ("Cloyster",    30),     14), #added
+    "Cloyster":         (91,     "water",       1,3,203,        (50, 95, 180, 85, 45, 70),  ("XXXXXXX",     0),      30),
+    "Gastly":           (92,     "ghost",       1,2,95,         (30, 35, 30, 100, 35, 80),  ("Haunter",     25),     18),
+    "Haunter":          (93,     "ghost",       1,2,126,        (45, 50, 45, 115, 55, 95),  ("Gengar",     50),      25), #added
+    "Gengar":           (94,     "ghost",       1,2,190,        (60, 65, 60, 130, 75, 110),  ("XXXXXXX",     0),     50),
+    "Onix":             (95,     "rock",        2,1,108,        (35, 45, 160, 30, 45, 70),  ("XXXXXXX",     0),      20),
+    "Drowzee":          (96,     "psychic",     1,1,102,        (60, 48, 45, 43, 90, 42),  ("Hypno",     26),        16),
+    "Hypno":            (97,     "psychic",     1,1,165,        (85, 73, 70, 73, 115, 67),  ("XXXXXXX",     0),      26),
+    "Krabby":           (98,     "water",       1,1,115,        (30, 105, 90, 25, 25, 50),  ("Kingler",     28),     12),
+    "Kingler":          (99,     "water",       1,1,206,        (55, 10, 115, 50, 50, 75),  ("XXXXXXX",     0),      28),
+    "Voltorb":          (100,     "electric",   1,1,103,        (40, 30, 50, 55, 55, 100),  ("Electrode",     30),   16),
+    "Electrode":        (101,     "electric",   1,1,150,        (60, 50, 70, 80, 80, 150),  ("XXXXXXX",     0),      30),
+    "Exeggcute":        (102,     "grass",      2,3,98,         (60, 40, 80, 60, 45, 40),  ("Exeggutor",     40),    22), #added
+    "Exeggutor":        (103,     "grass",      2,3,212,        (95, 95, 85, 125, 75, 55),  ("XXXXXXX",     0),      40),
+    "Cubone":           (104,     "ground",     1,1,87,         (50, 50, 95, 40, 50, 35),  ("Marowak",     28),      13),
+    "Marowak":          (105,     "ground",     1,1,124,        (60, 80, 110, 50, 80, 45),  ("XXXXXXX",     0),      28),
+    "Hitmonlee":        (106,     "fighting",   2,1,139,        (50, 120, 53, 35, 110, 87),  ("XXXXXXX",     0),     25),
+    "Hitmonchan":       (107,     "fighting",   2,1,140,        (50, 105, 79, 35, 110, 76),  ("XXXXXXX",     0),     25),
+    "Licktung":         (108,     "normal",     2,1,127,        (90, 55, 75, 60, 75, 30),  ("XXXXXXX",     0),       20),
+    "Koffing":          (109,     "poison",     1,1,114,        (40, 65, 95, 60, 45, 35),  ("Weezing",     35),      20),
+    "Weezing":          (110,     "poison",     1,1,173,        (65, 90, 120, 85, 70, 60),  ("XXXXXXX",     0),      35),
+    "Rhyhorn":          (111,     "rock",       1,3,135,        (80, 85, 95, 30, 30, 25),  ("Rhydon",     42),       23),
+    "Rhydon":           (112,     "rock",       1,3,204,        (105, 130, 120, 45, 45, 40),  ("XXXXXXX",     0),    42),
+    "Chansey":          (113,     "normal",     2,0,255,        (250, 5, 5, 35, 105, 50),  ("XXXXXXX",     0),       25),
+    "Tangela":          (114,     "grass",      1,1,166,        (65, 55, 115, 100, 40, 60),  ("XXXXXXX",     0),     18),
+    "Kangaskhan":       (115,     "normal",     2,1,175,        (105, 95, 80, 40, 80, 90),  ("XXXXXXX",     0),      28),
+    "Horsea":           (116,     "water",      1,1,83,         (30, 40, 70, 70, 25, 60),  ("Seadra",     32),       22),
+    "Seadra":           (117,     "water",      1,1,155,        (55, 65, 95, 95, 45, 85),  ("XXXXXXX",     0),       32),
+    "Goldeen":          (118,     "water",      1,1,111,        (45, 67, 60, 35, 50, 63),  ("Seaking",     33),      15),
+    "Seaking":          (119,     "water",      1,1,170,        (80, 92, 65, 65, 80, 68),  ("XXXXXXX",     0),       33),
+    "Staryu":           (120,     "water",      1,3,106,        (30, 45, 55, 70, 55, 85),  ("Starmie",     30),      15), #added
+    "Starmie":          (121,     "water",      1,3,207,        (60, 75, 85, 100, 85, 115),  ("XXXXXXX",     0),     30),
+    "Mr_mime":          (122,     "psychic",    2,1,136,        (40, 45, 65, 100, 120, 90),  ("XXXXXXX",     0),     25),
+    "Scyther":         (123,     "bug",         2,1,187,        (70, 110, 80, 55, 80, 105),  ("XXXXXXX",     0),     30),
+    "Jynx":             (124,     "psychic",    2,1,137,        (65, 50, 35, 15, 95, 95),  ("XXXXXXX",     0),       30),
+    "Electabuzz":        (125,     "electric",  2,1,156,        (65, 83, 57, 95, 85, 105),  ("XXXXXXX",     0),      30),
+    "Magmar":           (126,     "fire",       2,1,167,        (65, 95, 57, 100, 85, 93),  ("XXXXXXX",     0),      30),
+    "Pinsir":           (127,     "bug",        2,3,200,        (65, 125, 100, 55, 70, 85),  ("XXXXXXX",     0),     30),
+    "Tauros":           (128,     "normal",     2,3,211,        (75, 100, 95, 40, 80, 110),  ("XXXXXXX",     0),     30),
+    "Magikarp":         (129,     "water",      1,3,20,         (20, 10, 55, 15, 20, 80),  ("Gyarados",     20),     4),
+    "Gyarados":         (130,     "water",      2,3,214,        (95, 125, 79, 60, 100, 81),  ("XXXXXXX",     0),     20),
+    "Lapras":           (131,     "water",      2,3,219,        (130, 85, 80, 85, 95, 60),  ("XXXXXXX",     0),      30),
+    "Ditto":            (132,     "normal",     2,1,61,         (48, 48, 48, 48, 48, 48),  ("XXXXXXX",     0),       20),
+    "Eevee":            (133,     "normal",     2,1,92,         (55, 55, 50, 45, 65, 55),  ("Vaporeon",     30),     15), #added
+    "Vaporeon":         (134,     "grass",      2,1,196,        (130, 65, 60, 110, 95, 65),  ("XXXXXXX",     0),     30),
+    "Jolteon":          (135,     "electric",   2,1,197,        (65, 65, 60, 110, 95, 130),  ("XXXXXXX",     0),     30),
+    "Flareon":          (136,     "fire",       2,1,198,        (65, 130, 60, 95, 110, 65),  ("XXXXXXX",     0),     30),
+    "Porygon":          (137,     "normal",     2,1,130,        (65, 60, 70, 85, 75, 40),  ("XXXXXXX",     0),       25),
+    "Omanyte":          (138,     "water",      2,1,120,        (35, 40, 100, 90, 55, 35),  ("Omastar",     40),     25),
+    "Omastar":          (139,     "water",      2,1,199,        (70, 60, 125, 115, 70, 55),  ("XXXXXXX",     0),     40),
+    "Kabuto":           (140,     "water",      2,1,119,        (30, 80, 90, 55, 45, 55),  ("Kabutops",     40),     25),
+    "Kabutops":         (141,     "water",      2,1,201,        (60, 115, 105, 65, 70, 80),  ("XXXXXXX",     0),     40),
+    "Aerodactyl":       (142,     "flying",     2,3,202,        (80, 105, 65, 60, 75, 130),  ("XXXXXXX",     0),     30),
+    "Snorlax":          (143,     "normal",     2,3,154,        (160, 110, 65, 65, 110, 30),  ("XXXXXXX",     0),    30),
+    "Articuno":         (144,     "flying",     3,3,215,        (90, 85, 100, 95, 125, 85),  ("XXXXXXX",     0),     30),
+    "Zapdos":           (145,     "electric",   3,3,216,        (90, 90, 85, 125, 90, 100),  ("XXXXXXX",     0),     50),
+    "Moltres":          (146,     "flying",     3,3,217,        (90, 100, 90, 125, 85, 90),  ("XXXXXXX",     0),     50),
+    "Dratini":          (147,     "dragon",     2,3,67,         (41, 64, 45, 50, 50, 50),  ("Dragonair",     30),    20),
+    "Dragonair":        (148,     "dragon",     2,3,144,        (61, 84, 65, 70, 70, 70),  ("Dragonite",     55),    30),
+    "Dragonite":        (149,     "dragon",     2,3,218,        (91, 135, 95, 100, 100, 80),  ("XXXXXXX",     0),    55),
+    "Mewtwo":           (150,     "psychic",    3,3,220,        (106, 110, 90, 154, 90, 130),  ("XXXXXXX",     0),   70),
+    "Mew":              (151,     "psychic",    3,2,64,         (100, 100, 100, 100, 100, 100),  ("XXXXXXX",     0), 50),
     }   
 slow_medium_levels = [0] # original formula has a negative
     # which caused an integer underflow.  Just set it to 0.
@@ -261,8 +261,10 @@ for p in pokemon_dict.keys():
 
 for p, k in pokemon_dict.items():
     evolution_data = k[6]
+    lowest_level = k[7]
     if evolution_data[0] != "XXXXXXXX":
-        lowest_levels[evolution_data[0]] = evolution_data[1]
+#        lowest_levels[evolution_data[0]] = evolution_data[1]
+        lowest_levels[p] = lowest_level
     rarity = k[2]
 
     if rarity == 0:
@@ -292,12 +294,15 @@ s = sorted(a, key=lambda x: x[1])
 #    print(w)
 #sys.exit()
 class Channel(object):
-    def __init__(self, name):
+    def __init__(self, name, rate):
+        self.next_wild = rate
+        if not rate:
+            self.next_wild = random.randrange(70, 120)
         self.name = name
-        self.next_wild = random.randrange(100, 150)
-        self.current_privmsg = 0
+        self.current_privmsg = self.next_wild-3
         self.fainted_pokemon = None
         self.wild_pokemon = None
+        self.wild_pokemon_time = 0
     def increment_privmsg(self):
         self.current_privmsg += 1
     def __repr__(self):
@@ -376,6 +381,7 @@ class Pokemon(object):
         self.base_experience_value = self.stats[4]
         self.base_hp, self.base_att, self.base_def, self.base_satt, self.base_sdef, self.base_spd = self.stats[5]
         self.evolution, self.evolution_level  = self.stats[6]
+        self.lowest_level = self.stats[7]
 
     def get_experience(self):
         if self.growth_rate == 0:
@@ -469,6 +475,13 @@ class Pokemon(object):
     def speed(self):
         self._speed = round((((self.base_spd + self.speed_iv) * 2 + round(math.sqrt(self.speed_ev)/4)) * self.level)/100) + 5
 
+    #            pokemon.increase_health_five_percent()
+    def increase_health_five_percent(self):
+        current_hp = self._hp
+        five_percent = max(1, self.max_hp / 20)
+        new_hp = current_hp + five_percent
+        new_hp = min(self.max_hp, new_hp)
+        self._hp = new_hp
     def __repr__(self):
         hp_percent = self.hp_to_percent()
         if hp_percent > 66:
@@ -519,19 +532,22 @@ class ReconstructedPokemon(Pokemon):
 
         pass
 class Client(object):
-    def __init__(self, socket, channel, channels):
+    def __init__(self, socket, channel, channels, nick, db_file, rate):
         self.socket = socket
+        self.nick = nick
+        self.db_file = db_file
         self.now = int(time.time())
         self.next_pokemon_appearance = None
         self.players = []
         self.channels = []
         for c in channels:
             print(f"c is {c}")
-            self.channels.append(Channel(c))
+            self.channels.append(Channel(c, rate))
+
         print("the channels are")
         print(self.channels)
         self.channel = channel
-        if not os.path.exists("pokemon.db"):
+        if not os.path.exists(self.db_file):
             self.create_database()
         self.create_database()
         self.players = self.sql_get_trainers()
@@ -554,8 +570,8 @@ class Client(object):
         for p in pc_pokemon:
             player.stored.append(p)
     def connect(self):
-        self.send("USER ProfOak sean sean sean")
-        self.send("NICK ProfOak")
+        self.send(f"USER {self.nick} sean sean sean")
+        self.send(f"NICK {self.nick}")
     def join(self, channel):
         message = f"JOIN {channel}"
         print("JOINING CHANNEL")
@@ -834,6 +850,7 @@ class Client(object):
         return False
     def get_pokemon(self, which_pokemon, player, has_to_be="Neither"):
         pokemon = None
+        nick = player.name
         if which_pokemon.upper() in "ABCDEF":
             if has_to_be == "PC":
                 raise BadPrivMsgCommand(nick, f"PC pokemon are referred to by numerical numbers [0-...]")
@@ -841,6 +858,7 @@ class Client(object):
             which_container = player.party
             pokemon = which_container[which_pokemon]
             index = which_pokemon
+
         
         elif which_pokemon.isdigit():
             if has_to_be == "party":
@@ -885,6 +903,7 @@ class Client(object):
                 catch = True 
 
         index, container, pokemon = self.get_pokemon(which_pokemon, player, has_to_be="party")
+        #pokemon._hp = pokemon.max_hp
         loser = self.battle(pokemon, channel.wild_pokemon)
         # TODO: get rid of this, it's just for debugging
         #pokemon._hp = pokemon.max_hp
@@ -893,14 +912,14 @@ class Client(object):
             exp = pokemon.gain_experience(loser)
             pokemon.gain_ev(loser)
             before_name = pokemon.name
+            before_str = str(pokemon)
             level = pokemon.check_level()
             #TODO: until a better hp system is set up
-            pokemon._hp = pokemon.max_hp
             self.sql_update_pokemon(pokemon)
-            message = f"{nick}'s {before_name} defeated the {channel.wild_pokemon.name}. {before_name} gained {exp} EXP. "
+            message = f"{nick}'s {before_str} defeated the {channel.wild_pokemon.name}. {before_str} gained {exp} EXP and is at {pokemon.hp_to_percent()}% health. "
             if level:
                 pokemon.level = level
-                message += f"{before_name} is now level {pokemon.level}. "
+                message += f"{before_str} is now level {pokemon.level}. "
                 if pokemon.name != before_name:
                     message += f"{before_name} evolved into {pokemon.name}!"
                     self.sql_evolve(pokemon)
@@ -920,8 +939,9 @@ class Client(object):
             self.send_to(channel.name, message)
         else:
             #TODO: make it so only the last trainer can't fight pokemon
-            self.send_to(channel.name, f"{nick}'s {pokemon.name} lost the battle, and the {channel.wild_pokemon.name} ran away!")
-            channel.wild_pokemon = None
+            self.send_to(channel.name, f"{nick}'s {pokemon} lost the battle!")
+            #channel.wild_pokemon = None
+        self.sql_update_health(pokemon)
                 
     def parse_starter(self, nick, command):
         f_starters = " ".join(starters)
@@ -985,9 +1005,15 @@ class Client(object):
                 boxes.append(pkmn.level)
         if not boxes:
             boxes = [5]
-        which_box = random.choice(boxes)
-        level = which_box + random.randrange(-5, 5)
-        level = max(1, level)
+        higher_pokemon = random.randrange(100)
+        # randomly select one of the levels of the three highest pokemon and make a tougher pokemon than those
+        if higher_pokemon >= 95 and len(boxes) > 6: #TODO: fix
+            three_highest = list(reversed(sorted(boxes)))[:3]
+            level = random.choice(three_highest) + random.randrange(5, 15)
+        else:
+            which_box = random.choice(boxes)
+            level = which_box + random.randrange(-5, 5)
+        level = max(2, level)
         level = min(100, level)
        # Rareness:
        # 0: 40% - Common Technically less rare but there are fewer in thsi category, making each species more common
@@ -1017,17 +1043,45 @@ class Client(object):
         print(pokemon)
         return pokemon
 
+    def sql_update_health(self, pokemon):
+        print("updating helath")
+        self.cur.execute("""UPDATE pokemon SET hp = ? WHERE pokemon_id = ?""", (pokemon._hp, pokemon.index))
+        self.con.commit()
+        
+        #self.cur.execute("""CREATE TABLE IF NOT EXISTS pokemon (pokemon_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, species TEXT NOT NULL, trainer INTEGER, container_label TEXT,  experience INTEGER, hp INTEGER, health_iv INTEGER, attack_iv INTEGER, defense_iv INTEGER, sattack_iv INTEGER, sdefense_iv INTEGER, speed_iv INTEGER, health_ev INTEGER, attack_ev INTEGER, defense_ev INTEGER, sattack_ev INTEGER, sdefense_ev INTEGER, speed_ev INTEGER, FOREIGN KEY (trainer) REFERENCES trainers(trainer_id))""")
+    def update_health_all(self):
+        for player in self.players:
+            for pokemon in player.party:
+                before = pokemon._hp
+                pokemon.increase_health_five_percent()
+                if before != pokemon._hp:
+                    self.sql_update_health(pokemon)
+
     def loop(self):
         self.repelling = False
         self.wild_pokemon = None
         self.fainted_pokemon = None
+        wild_pokemon_time = None
+        next_heal_time = int(time.time() + 180)
         while True:
+            self.current_time = int(time.time())
+            if self.current_time >= next_heal_time:
+                self.update_health_all()
+                next_heal_time = self.current_time + 180
+            
             for c in self.channels:
                 if c.current_privmsg >= c.next_wild and not c.wild_pokemon:
                     c.fainted_pokemon = None
                     c.wild_pokemon = self.make_next_wild_pokemon()
+                    c.wild_pokemon_time = int(time.time()) + 600
                     self.send_to(c.name, f"A wild {c.wild_pokemon} appeared!")
 
+                if self.current_time >= c.wild_pokemon_time and c.wild_pokemon and c.current_privmsg > 0:
+                    self.send_to(c.name, f"The wild {c.wild_pokemon} wandered off.")
+                    del c.wild_pokemon
+                    c.wild_pokemon = None
+                    c.current_privmsg = 0
+                    #c.wild_pokemon = None
         #self.current_privmsg += 1
 
 #            self.now = int(time.time())
@@ -1045,13 +1099,18 @@ class Client(object):
                 data = self.socket.recv(1024)
             except:
                 continue
-            data = data.decode("utf-8")
+            try:
+                data = data.decode("utf-8")
+            except UnicodeDecodeError:
+                continue
             data = data.lstrip(":")
             data = data.split()
             if not data:
                 continue
             first_arg = data[0]
-            second_arg = data[1]
+            try:
+                second_arg = data[1]
+            except: continue
             print("YYYYYYYYYYYYYY", data)
             if first_arg.lower() == "ping":
                 self.handle_ping(data)
@@ -1068,7 +1127,8 @@ class Client(object):
 
     def create_database(self):
         print("created a new database")
-        self.con = sqlite3.connect("pokemon.db")
+        #self.con = sqlite3.connect("pokemon.db")
+        self.con = sqlite3.connect(self.db_file)
         self.con.execute("PRAGMA foreign_keys = 1")
         self.cur = self.con.cursor()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS trainers (trainer_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, nick TEXT NOT NULL UNIQUE)""")
@@ -1091,10 +1151,22 @@ class Client(object):
             player.index = index
             all_trainers.append(player)
         return all_trainers
-    
+test = False
+if test:
+    nick = "TestOak"
+    db_file = "test.db"
+    channels = ["#pokemon2"]
+    rate = 3
+else:
+    nick = "ProfOak"
+    db_file = "pokemon.db"
+    channels = ["#pokemon", "#atheism"]
+    rate = None
+
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     a = s.connect((HOST, PORT))
     s.setblocking(False)
-    client = Client(s, "#pokemon", ["#pokemon", "#atheism"])
+    #client = Client(s, "#pokemon", ["#pokemon", "#atheism"])
+    client = Client(s, "#pokemon", channels, nick, db_file, rate)#, "#atheism"])
     client.connect()
     client.loop()
