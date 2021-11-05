@@ -79,26 +79,26 @@ pokemon_dict = {
     #"Bulbasaur":        (1,     "grass",        1,2,64,         (45, 49, 49,  65,  65, 45),  ("Ivysaur",     8),    10),
     "Ivysaur":          (2,     "grass",        1,2,141,        (60, 62, 63,  80,  80, 60),  ("Venusaur",     32),   16),
     #"Ivysaur":          (2,     "grass",        1,2,141,        (60, 62, 63,  80,  80, 60),  ("Venusaur",     12),  16),
-    "Venusaur":         (3,     "grass",        1,2,208,        (80, 82, 83, 100, 100, 80),  ("XXXXXXX",     0),     32),
+    "Venusaur":         (3,     "grass",        2,2,208,        (80, 82, 83, 100, 100, 80),  ("XXXXXXX",     0),     32),
     "Charmander":       (4,     "fire",         1,2,65,         (39, 52, 43, 60, 50, 65),  ("Charmeleon",     16),   8),
     "Charmeleon":        (5,     "fire",         1,2,142,        (58, 64, 58, 80, 65, 80),  ("Charizard",     36),   16),
-    "Charizard":        (6,     "fire",         1,2,209,        (78, 84, 78, 109, 85, 100),  ("XXXXXXX",     0),     32),
+    "Charizard":        (6,     "fire",         2,2,209,        (78, 84, 78, 109, 85, 100),  ("XXXXXXX",     0),     32),
     "Squirtle":         (7,     "water",        1,2,66,         (44, 48, 65, 50, 64, 43),  ("Wartortle",     16),    8),
     "Wartortle":        (8,     "water",        1,2,143,        (59, 63, 80, 65, 80, 58),  ("Blastoise",     36),    16),
-    "Blastoise":        (9,     "water",        1,2,210,        (79, 83, 100, 85, 105, 78),  ("XXXXXXX",     0),     32),
+    "Blastoise":        (9,     "water",        2,2,210,        (79, 83, 100, 85, 105, 78),  ("XXXXXXX",     0),     32),
     "Caterpie":         (10,     "bug",         0,1,53,         (45, 30, 35, 20, 20, 45),  ("Metapod",     7),       2),
     "Metapod":          (11,     "bug",         0,1,72,         (50, 20, 55, 25, 25, 30),  ("Butterfree",    10),    7),
-    "Butterfree":       (12,     "bug",         0,1,160,        (60, 45, 50, 90, 80, 70),  ("XXXXXXX",     0),       10),
+    "Butterfree":       (12,     "bug",         1,1,160,        (60, 45, 50, 90, 80, 70),  ("XXXXXXX",     0),       10),
     "Weedle":           (13,     "bug",         0,1,52,         (40, 35, 30, 20, 20, 50),  ("Kakuna",     7),        2),
     "Kakuna":           (15,     "bug",         0,1,71,         (45, 25, 50, 25, 25, 35),  ("Beedrill",     10),     7),
-    "Beedrill":         (15,     "bug",         0,1,159,        (65, 90, 40, 45, 80, 75),  ("XXXXXXX",     0),       10),
+    "Beedrill":         (15,     "bug",         1,1,159,        (65, 90, 40, 45, 80, 75),  ("XXXXXXX",     0),       10),
     "Pidgey":           (16,     "flying",      0,2,55,         (40, 45, 40, 35, 35, 56),  ("Pidgeotto",     18),    2),
-    "Pidgeotto":        (17,     "flying",      0,2,113,        (63, 60, 55, 50, 50, 71),  ("Pidgeot",     36),      18),
-    "Pidgeot":          (18,     "flying",      0,2,172,        (83, 80, 75, 70, 70, 101),  ("XXXXXXX",     0),      36),
+    "Pidgeotto":        (17,     "flying",      1,2,113,        (63, 60, 55, 50, 50, 71),  ("Pidgeot",     36),      18),
+    "Pidgeot":          (18,     "flying",      1,2,172,        (83, 80, 75, 70, 70, 101),  ("XXXXXXX",     0),      36),
     "Rattata":          (19,     "normal",      0,1,57,         (30, 56, 35, 25, 35, 72),  ("Raticate",     20),     2),
-    "Raticate":         (20,     "normal",      0,1,116,        (55, 81, 60, 50, 70, 97),  ("XXXXXXX",     0),       20),
+    "Raticate":         (20,     "normal",      1,1,116,        (55, 81, 60, 50, 70, 97),  ("XXXXXXX",     0),       20),
     "Spearow":          (21,     "flying",      0,1,58,         (40, 60, 30, 31, 31, 70),  ("Fearow",     20),       2),
-    "Fearow":           (22,     "flying",      0,1,162,        (65, 90, 65, 61, 61, 100),  ("XXXXXXX",     0),      20),
+    "Fearow":           (22,     "flying",      1,1,162,        (65, 90, 65, 61, 61, 100),  ("XXXXXXX",     0),      20),
     "Ekans":            (23,     "poison",      1,1,62,         (35, 60, 44, 40, 54, 55),  ("Arbok",     22),        3),
     "Arbok":            (24,     "poison",      1,1,147,        (60, 95, 69, 65, 79, 80),  ("XXXXXXX",     0),       22),
     "Pikachu":          (25,     "electric",    2,1,82,         (35, 55, 40, 50, 50, 90),  ("Raichu",     22),       8), # added
@@ -106,11 +106,11 @@ pokemon_dict = {
     "Sandshrew":        (27,     "ground",      1,1,93,         (50, 75, 85, 20, 30, 40),  ("Sandslash",     22),    4),
     "Sandslash":        (28,     "ground",      1,1,163,        (75, 100, 110, 45, 55, 65),  ("XXXXXXX",     0),     22),
     "Nidoran_f":        (29,     "poison",      0,2,59,         (55, 47, 52, 40, 40, 41),  ("Nidorina",     16),     3),
-    "Nidorina":         (30,     "poison",      0,2,117,        (70, 62, 67, 55, 55, 56),  ("Nidoqueen",     35),    16), # added
-    "Nidoqueen":        (31,     "poison",      0,2,194,        (90, 92, 87, 75, 85, 76),  ("XXXXXXX",     0),       35),
+    "Nidorina":         (30,     "poison",      1,2,117,        (70, 62, 67, 55, 55, 56),  ("Nidoqueen",     35),    16), # added
+    "Nidoqueen":        (31,     "poison",      1,2,194,        (90, 92, 87, 75, 85, 76),  ("XXXXXXX",     0),       35),
     "Nidoran_m":        (32,     "poison",      0,2,60,         (46, 57, 40, 40, 40, 50),  ("Nidorino",     16),     3),
-    "Nidorino":         (33,     "poison",      0,2,118,        (61, 72, 57, 55, 55, 65),  ("Nidoking",     35),     16), # added
-    "Nidoking":         (34,     "poison",      0,2,195,        (81, 102, 77, 85, 75, 85),  ("XXXXXXX",     0),      35),
+    "Nidorino":         (33,     "poison",      1,2,118,        (61, 72, 57, 55, 55, 65),  ("Nidoking",     35),     16), # added
+    "Nidoking":         (34,     "poison",      1,2,195,        (81, 102, 77, 85, 75, 85),  ("XXXXXXX",     0),      35),
     "Clefairy":         (35,     "normal",      2,0,68,         (70, 45, 48, 60, 65, 35),  ("Clefable",     30),     5), # added
     "Clefable":         (36,     "normal",      2,0,129,        (95, 70, 73, 95, 90, 60),  ("XXXXXXX",     0),       30),
     "Vulpix":           (37,     "fire",        1,1,63,         (38, 41, 40, 50, 65, 65),  ("Ninetails",     30),    5), # added
@@ -118,16 +118,16 @@ pokemon_dict = {
     "Jigglypuff":       (39,     "normal",      2,0,76,         (115, 45, 20, 45, 25, 20),  ("Wigglytuff",     30),  5), # added
     "Wigglytuff":       (40,     "normal",      2,0,109,        (140, 70, 45, 85, 50, 45),  ("XXXXXXX",     0),      30),
     "Zubat":            (41,     "poison",      0,1,54,         (40,  45, 35, 30, 40, 55),  ("Golbat",     22),      5),
-    "Golbat":           (42,     "poison",      0,1,171,        (75, 80, 70, 65, 75, 90),  ("XXXXXXX",     0),       22),
+    "Golbat":           (42,     "poison",      1,1,171,        (75, 80, 70, 65, 75, 90),  ("XXXXXXX",     0),       22),
     "Oddish":           (43,     "grass",       0,2,78,         (45, 50, 55, 75, 65, 30),  ("Gloom",     21),        5),
-    "Gloom":            (44,     "grass",       0,2,132,        (60, 65, 70, 85, 75, 40),  ("Vileplume",     40),    21), # added
-    "Vileplume":        (45,     "grass",       0,2,184,        (75, 80, 85, 110, 90, 50),  ("XXXXXXX",     0),      40),
+    "Gloom":            (44,     "grass",       1,2,132,        (60, 65, 70, 85, 75, 40),  ("Vileplume",     40),    21), # added
+    "Vileplume":        (45,     "grass",       1,2,184,        (75, 80, 85, 110, 90, 50),  ("XXXXXXX",     0),      40),
     "Paras":            (46,     "bug",         1,1,70,         (35, 70, 55, 45, 55, 25),  ("Parasect",     24),     5),
     "Parasect":         (47,     "bug",         1,1,128,        (60, 95, 80, 60, 80, 30),  ("XXXXXXX",     0),       24),
     "Venonat":          (48,     "bug",         1,1,75,         (60, 55, 50, 40, 55, 45),  ("Venomoth",     31),     5),
     "Venomoth":         (49,     "bug",         1,1,138,        (70, 65, 60, 90, 75, 90),  ("XXXXXXX",     0),       31),
     "Diglett":          (50,     "ground",      0,1,81,         (10, 55, 25, 35, 45, 95),  ("Dugtrio",     26),      6),
-    "Dugtrio":          (51,     "ground",      0,1,153,        (35, 100, 50, 50, 70, 120),  ("XXXXXXX",     0),     26),
+    "Dugtrio":          (51,     "ground",      1,1,153,        (35, 100, 50, 50, 70, 120),  ("XXXXXXX",     0),     26),
     "Meowth":           (52,     "normal",      1,1,69,         (40, 45, 35, 40, 40, 90),  ("Persian",     28),      8),
     "Persian":          (53,     "normal",      1,1,148,        (65, 70, 60, 65, 65, 115),  ("XXXXXXX",     0),      28),
     "Psyduck":          (54,     "water",       1,1,80,         (50, 52, 48, 65, 50, 55),  ("Golduck",     33),      10),
@@ -141,18 +141,18 @@ pokemon_dict = {
     "Poliwrath":        (62,     "water",       1,2,185,        (90, 95, 95, 70, 90, 70),  ("XXXXXXX",     0),       40),
     "Abra":             (63,     "psychic",     1,2,73,         (25, 20, 15, 105, 55, 90),  ("Kadabra",     16),     8),
     "Kadabra":          (64,     "psychic",     1,2,145,        (40, 35, 30, 120, 70, 105),  ("Alakazam",     40),   16), #added
-    "Alakazam":         (65,     "psychic",     1,2,186,        (55, 50, 45, 135, 95, 120),  ("XXXXXXX",     0),     40),
+    "Alakazam":         (65,     "psychic",     2,2,186,        (55, 50, 45, 135, 95, 120),  ("XXXXXXX",     0),     40),
     "Machop":           (66,     "fighting",    1,2,88,         (70, 80, 50, 35, 35, 35),  ("Machoke",     28),      8),
     "Machoke":          (67,     "fighting",    1,2,146,        (80, 100, 70, 50, 60, 45),  ("Machamp",     40),     28), #added
-    "Machamp":          (68,     "fighting",    1,2,193,        (90, 130, 80, 65, 85, 55),  ("XXXXXXX",     0),      40),
+    "Machamp":          (68,     "fighting",    2,2,193,        (90, 130, 80, 65, 85, 55),  ("XXXXXXX",     0),      40),
     "Bellsprout":       (69,     "grass",       1,2,84,         (50, 75, 35, 70, 30, 40),  ("Weepinbell",     21),   8),
     "Weepinbell":       (70,     "grass",       1,2,151,        (65, 90, 50, 85, 45, 55),  ("Victreebell",     40),  21), #added
-    "Victreebel":       (71,     "grass",       1,2,191,        (80, 105, 65, 100, 70, 70),  ("XXXXXXX",     0),     40),
+    "Victreebel":       (71,     "grass",       2,2,191,        (80, 105, 65, 100, 70, 70),  ("XXXXXXX",     0),     40),
     "Tentacool":        (72,     "grass",       1,3,105,        (40, 40, 35, 50, 100, 70),  ("Tentacruel",     30),  10),
     "Tentacruel":       (73,     "grass",       1,3,205,        (80, 70, 65, 80, 120, 100),  ("XXXXXXX",     0),     30),
     "Geodude":          (74,     "rock",        1,2,86,         (40, 80, 100, 30, 30, 20),  ("Graveler",     25),    9),
     "Graveler":         (75,     "rock",        1,2,134,        (55, 95, 115, 45, 45, 35),  ("Golem",     45),       25), #added
-    "Golem":            (76,     "rock",        1,2,177,        (80, 120, 130, 55, 65, 45),  ("XXXXXXX",     0),     45),
+    "Golem":            (76,     "rock",        2,2,177,        (80, 120, 130, 55, 65, 45),  ("XXXXXXX",     0),     45),
     "Ponyta":           (77,     "fire",        1,1,152,        (50, 85, 55, 65, 65, 90),  ("Rapidash",     40),     12),
     "Rapidash":         (78,     "fire",        1,1,192,        (65, 100, 70, 80, 80, 105),  ("XXXXXXX",     0),     40),
     "Slowpoke":         (79,     "water",       1,1,99,         (90, 65, 65, 40, 40, 15),  ("Slowbro",     37),      12),
@@ -170,7 +170,7 @@ pokemon_dict = {
     "Cloyster":         (91,     "water",       1,3,203,        (50, 95, 180, 85, 45, 70),  ("XXXXXXX",     0),      30),
     "Gastly":           (92,     "ghost",       1,2,95,         (30, 35, 30, 100, 35, 80),  ("Haunter",     25),     18),
     "Haunter":          (93,     "ghost",       1,2,126,        (45, 50, 45, 115, 55, 95),  ("Gengar",     50),      25), #added
-    "Gengar":           (94,     "ghost",       1,2,190,        (60, 65, 60, 130, 75, 110),  ("XXXXXXX",     0),     50),
+    "Gengar":           (94,     "ghost",       2,2,190,        (60, 65, 60, 130, 75, 110),  ("XXXXXXX",     0),     50),
     "Onix":             (95,     "rock",        2,1,108,        (35, 45, 160, 30, 45, 70),  ("XXXXXXX",     0),      20),
     "Drowzee":          (96,     "psychic",     1,1,102,        (60, 48, 45, 43, 90, 42),  ("Hypno",     26),        16),
     "Hypno":            (97,     "psychic",     1,1,165,        (85, 73, 70, 73, 115, 67),  ("XXXXXXX",     0),      26),
@@ -228,7 +228,7 @@ pokemon_dict = {
     "Dragonite":        (149,     "dragon",     2,3,218,        (91, 135, 95, 100, 100, 80),  ("XXXXXXX",     0),    55),
     "Mewtwo":           (150,     "psychic",    3,3,220,        (106, 110, 90, 154, 90, 130),  ("XXXXXXX",     0),   70),
     "Mew":              (151,     "psychic",    3,2,64,         (100, 100, 100, 100, 100, 100),  ("XXXXXXX",     0), 50),
-    }   
+    }
 slow_medium_levels = [0] # original formula has a negative
     # which caused an integer underflow.  Just set it to 0.
 
@@ -294,17 +294,86 @@ s = sorted(a, key=lambda x: x[1])
 #    print(w)
 #sys.exit()
 class Channel(object):
-    def __init__(self, name, rate):
+    def __init__(self, name, rate, game):
+        self.game = game
         self.next_wild = rate
         if not rate:
             self.next_wild = random.randrange(70, 120)
         self.name = name
         self.current_privmsg = self.next_wild-3
+#        self.current_privmsg = 0
         self.fainted_pokemon = None
         self.wild_pokemon = None
         self.wild_pokemon_time = 0
-    def increment_privmsg(self):
+        self.active_players = set()
+        self.ignore_players = False
+    def reset_next_wild(self):
+        self.current_privmsg = 0
+        #self.next_wild = random.randrange(70, 120)
+        if test:
+            self.next_wild = random.randrange(5, 6)
+        else:
+            self.next_wild = random.randrange(70, 120)
+        self.active_players = set()
+
+    def increment_privmsg(self, nick):
+        player = self.game.get_player(nick) 
+        if player:
+            self.active_players.add(player)
+
         self.current_privmsg += 1
+        print(self.current_privmsg, "current privmsg")
+        
+    def make_next_wild_pokemon(self):
+        boxes = []
+        players = self.active_players
+        print(self.ignore_players, self.active_players)
+        if self.ignore_players or not self.active_players:
+            players = self.game.players
+        for p in self.active_players:
+            for pkmn in p.party:
+                boxes.append(pkmn.level)
+        if not boxes:
+            boxes = [5]
+        higher_pokemon = random.randrange(100)
+        # randomly select one of the levels of the three highest pokemon and make a tougher pokemon than those
+        #if higher_pokemon >= 95 and len(boxes) > 6: #TODO: fix
+        if higher_pokemon >= 100 and len(boxes) > 6: #XXX disabling because paine was complaining, may re-enable with lure
+            three_highest = list(reversed(sorted(boxes)))[:3]
+            level = random.choice(three_highest) + random.randrange(5, 15)
+        else:
+            which_box = random.choice(boxes)
+            level = which_box + random.randrange(-5, 5)
+        level = max(2, level)
+        level = min(100, level)
+       # Rareness:
+       # 0: 40% - Common Technically less rare but there are fewer in thsi category, making each species more common
+       # 1: 50% - Average rareness
+       # 2: 9% -  Rare
+       # 3: 1% - Legendary
+        while True:
+            random_num = random.randrange(100)
+            if random_num < 40:
+                species = random.choice(common)
+            elif random_num < 90:
+                species = random.choice(average)
+            elif random_num < 99:
+                species = random.choice(rare)
+            else:
+                species = random.choice(legendary)
+            # so we don't get level 2 charizards
+            if lowest_levels[species] > level:
+                continue
+            # so we don't get level 100 charmanders
+            evolution_level = pokemon_dict[species][6][1]
+            if evolution_level != 0 and evolution_level <= level:
+                continue
+            else: break
+        self.reset_next_wild()
+#        self.ignore_players = False
+#        self.active_players = set()
+        pokemon = Pokemon(species, level)
+        return pokemon
     def __repr__(self):
         return self.name
 
@@ -323,6 +392,12 @@ class Player(object):
         self.name = name
         self.party = []
         self.stored = []
+        self.potions = 5
+        #TODO recreate player with potions and pokeballs
+
+    def increment_potions(self):
+        self.potions += 1
+        self.potions = min(5, self.potions)
 
     def get_container_label(self, pokemon):
         for e, p in enumerate(self.party):
@@ -532,6 +607,7 @@ class ReconstructedPokemon(Pokemon):
 
         pass
 class Client(object):
+    #TODO: QUIT messages, handling timeouts
     def __init__(self, socket, channel, channels, nick, db_file, rate):
         self.socket = socket
         self.nick = nick
@@ -542,7 +618,7 @@ class Client(object):
         self.channels = []
         for c in channels:
             print(f"c is {c}")
-            self.channels.append(Channel(c, rate))
+            self.channels.append(Channel(c, rate, self))
 
         print("the channels are")
         print(self.channels)
@@ -610,7 +686,8 @@ class Client(object):
                 break
 
         if channel:
-            channel.current_privmsg += 1
+            channel.increment_privmsg(nick)
+            #channel.current_privmsg += 1
         print(f"recipient is {recipient}")
         message = " ".join(data[3:])
         message = message.lstrip(":").lower()
@@ -623,8 +700,11 @@ class Client(object):
             self.parse_starter(nick, split)
         if player_cmd == "#go" and channel:
             self.parse_go(channel, nick, split)
+
+        elif player_cmd == "#debugheal" and test: #XXX
+            self.parse_debugheal(nick)
         elif player_cmd == "#heal":
-            self.parse_heal(nick)
+            self.parse_heal(nick, split)
         elif player_cmd == "#team":
             self.parse_team(nick)
         elif player_cmd == "#examine":
@@ -780,12 +860,35 @@ class Client(object):
         message += f"\x0300GrowthRate\x03:{growth_dict[pkmn.growth_rate]}"
         self.send_to(nick, message)
 
-    def parse_heal(self, nick):
+    def heal_pokemon(self, pokemon):
+        pokemon._hp = pokemon.max_hp
+        self.sql_update_health(pokemon)
+
+    def parse_heal(self, nick, command):
+        if nick not in self.player_list:
+            raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
+        if len(command) < 2:
+            raise BadPrivMsgCommand(nick, f"Syntax: #heal <pokemon_label>")
+        player = self.get_player(nick)
+        index, container, pokemon = self.get_pokemon(command[1].lower(), player, has_to_be="party")
+        
+        if player.potions > 0:
+            self.heal_pokemon(pokemon)
+            player.potions -= 1
+            self.send_to(nick, f"You've healed {pokemon} to full health!  You now have {player.potions} potion(s).")
+        else:
+            raise BadPrivMsgCommand(nick, "You do not have any potions left!")
+
+
+            
+        
+    def parse_debugheal(self, nick):
         if nick not in self.player_list:
             raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
         player = self.get_player(nick)
         for pokemon in player.party:
             pokemon._hp = pokemon.max_hp
+            self.sql_update_health(pokemon)
         self.send_to(nick, "You've healed all the pokemon in your party")
 
     def parse_team(self, nick):
@@ -856,7 +959,10 @@ class Client(object):
                 raise BadPrivMsgCommand(nick, f"PC pokemon are referred to by numerical numbers [0-...]")
             which_pokemon = "ABCDEF".index(which_pokemon.upper())
             which_container = player.party
-            pokemon = which_container[which_pokemon]
+            try:
+                pokemon = which_container[which_pokemon]
+            except:
+                raise BadPrivMsgCommand(nick, f"You do not have that many pokemon in your PC")
             index = which_pokemon
 
         
@@ -903,6 +1009,8 @@ class Client(object):
                 catch = True 
 
         index, container, pokemon = self.get_pokemon(which_pokemon, player, has_to_be="party")
+        if pokemon._hp <= 0:
+            raise BadChanCommand(channel.name, f"{pokemon} has fainted and can't fight!")
         #pokemon._hp = pokemon.max_hp
         loser = self.battle(pokemon, channel.wild_pokemon)
         # TODO: get rid of this, it's just for debugging
@@ -923,6 +1031,7 @@ class Client(object):
                 if pokemon.name != before_name:
                     message += f"{before_name} evolved into {pokemon.name}!"
                     self.sql_evolve(pokemon)
+            #channel.reset_next_wild()
             channel.wild_pokemon = None
             if catch:
                 loser.captured = True
@@ -939,7 +1048,7 @@ class Client(object):
             self.send_to(channel.name, message)
         else:
             #TODO: make it so only the last trainer can't fight pokemon
-            self.send_to(channel.name, f"{nick}'s {pokemon} lost the battle!")
+            self.send_to(channel.name, f"{nick}'s {pokemon} lost the battle! {channel.wild_pokemon}'s health: {channel.wild_pokemon.hp_to_percent()}%")
             #channel.wild_pokemon = None
         self.sql_update_health(pokemon)
                 
@@ -998,50 +1107,6 @@ class Client(object):
             print("KKKKKKKKKK", c)
             self.join(c.name)
 
-    def make_next_wild_pokemon(self):
-        boxes = []
-        for p in self.players:
-            for pkmn in p.party:
-                boxes.append(pkmn.level)
-        if not boxes:
-            boxes = [5]
-        higher_pokemon = random.randrange(100)
-        # randomly select one of the levels of the three highest pokemon and make a tougher pokemon than those
-        if higher_pokemon >= 95 and len(boxes) > 6: #TODO: fix
-            three_highest = list(reversed(sorted(boxes)))[:3]
-            level = random.choice(three_highest) + random.randrange(5, 15)
-        else:
-            which_box = random.choice(boxes)
-            level = which_box + random.randrange(-5, 5)
-        level = max(2, level)
-        level = min(100, level)
-       # Rareness:
-       # 0: 40% - Common Technically less rare but there are fewer in thsi category, making each species more common
-       # 1: 50% - Average rareness
-       # 2: 9% -  Rare
-       # 3: 1% - Legendary
-        while True:
-            random_num = random.randrange(100)
-            if random_num < 40:
-                species = random.choice(common)
-            elif random_num < 90:
-                species = random.choice(average)
-            elif random_num < 99:
-                species = random.choice(rare)
-            else:
-                species = random.choice(legendary)
-            # so we don't get level 2 charizards
-            if lowest_levels[species] > level:
-                continue
-            # so we don't get level 100 charmanders
-            evolution_level = pokemon_dict[species][6][1]
-            if evolution_level != 0 and evolution_level <= level:
-                continue
-            else: break
-        pokemon = Pokemon(species, level)
-        print("test etest")
-        print(pokemon)
-        return pokemon
 
     def sql_update_health(self, pokemon):
         print("updating helath")
@@ -1063,16 +1128,22 @@ class Client(object):
         self.fainted_pokemon = None
         wild_pokemon_time = None
         next_heal_time = int(time.time() + 180)
+        potion_time = 14400
+        next_free_potion = int(time.time()) + potion_time
         while True:
             self.current_time = int(time.time())
             if self.current_time >= next_heal_time:
                 self.update_health_all()
                 next_heal_time = self.current_time + 180
+            if self.current_time >= next_free_potion:
+                for p in self.players:
+                    p.increment_potions()
+                    next_free_potion = self.current_time + potion_time
             
             for c in self.channels:
                 if c.current_privmsg >= c.next_wild and not c.wild_pokemon:
                     c.fainted_pokemon = None
-                    c.wild_pokemon = self.make_next_wild_pokemon()
+                    c.wild_pokemon = c.make_next_wild_pokemon()
                     c.wild_pokemon_time = int(time.time()) + 600
                     self.send_to(c.name, f"A wild {c.wild_pokemon} appeared!")
 
@@ -1080,7 +1151,8 @@ class Client(object):
                     self.send_to(c.name, f"The wild {c.wild_pokemon} wandered off.")
                     del c.wild_pokemon
                     c.wild_pokemon = None
-                    c.current_privmsg = 0
+                    c.reset_next_wild()
+                    #c.current_privmsg = 0
                     #c.wild_pokemon = None
         #self.current_privmsg += 1
 
@@ -1127,7 +1199,6 @@ class Client(object):
 
     def create_database(self):
         print("created a new database")
-        #self.con = sqlite3.connect("pokemon.db")
         self.con = sqlite3.connect(self.db_file)
         self.con.execute("PRAGMA foreign_keys = 1")
         self.cur = self.con.cursor()
