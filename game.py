@@ -647,30 +647,29 @@ class ReconstructedPokemon(Pokemon):
         pass
 class Client(object):
     #TODO: QUIT messages, handling timeouts
-    def __init__(self, socket, channel, channels, nick, db_file, rate, config):
+    def __init__(self, socket, config):
         self.socket = socket
-        self.nick = nick
-        self.db_file = db_file
         self.now = int(time.time())
         self.next_pokemon_appearance = None
         self.players = []
         self.channels = []
         self.parse_config(config)
         self.client_ready = False
-        #for c in channels:
-        #    print(f"c is {c}")
-        #    self.channels.append(Channel(c, rate, self))
 
-        self.channel = channel
         if not os.path.exists(self.db_file):
             self.create_database()
         self.create_database()
         self.players = self.sql_get_trainers()
         for p in self.players:
             self.reconstruct_pokemon(p)
-#        sys.exit()
+
     def parse_config(self, config):
         sections = config.sections()
+        if len(sections) < 1:
+            raise Exception("need more sections")
+        main = sections[0]
+        self.nick = config[main]["nick"]
+        self.db_file = config[main]["db_file"]
 
         for name in sections[1:]:
             section = config[name]
@@ -1239,7 +1238,10 @@ class Client(object):
         potion_time = 14400
         next_free_potion = int(time.time()) + potion_time
         while True:
+            
             time.sleep(0.001)
+            self.current_time = int(time.time())
+#            self.test_connection()
             data_received = False
             try:
                 data = self.socket.recv(1024)
@@ -1278,7 +1280,6 @@ class Client(object):
                         pass
             if not self.client_ready:
                 continue
-            self.current_time = int(time.time())
             if self.current_time >= next_heal_time:
                 self.update_health_all()
                 next_heal_time = self.current_time + 180
@@ -1317,7 +1318,6 @@ class Client(object):
 #                    self.next_pokemon_appearance = 0
 
     def create_database(self):
-        print("created a new database")
         self.con = sqlite3.connect(self.db_file)
         self.con.execute("PRAGMA foreign_keys = 1")
         self.cur = self.con.cursor()
@@ -1341,39 +1341,24 @@ class Client(object):
             player.index = index
             all_trainers.append(player)
         return all_trainers
-test = False
+test = True
 if test:
     nick = "TestOak"
-    db_file = "test.db"
-    channels = ["#pokemon2"]
+#    db_file = "test.db"
+#    channels = ["#pokemon2"]
     conf_file = "pokemon2.conf"
-    rate = 3
+#    rate = 3
 else:
-    nick = "ProfOak"
-    db_file = "pokemon.db"
-    channels = ["#pokemon", "#atheism"]
+#    nick = "ProfOak"
+#    db_file = "pokemon.db"
+#    channels = ["#pokemon", "#atheism"]
     conf_file = "pokemon.conf"
-    rate = None
-#config = configparser.ConfigParser()
-#config.read(conf_file)
-#print(config.sections())
-#print(config["#pokemon2"])
-#print(type(config["#pokemon2"]))
-#print(config["#pokemon2"].values())
-#print(dir(config["#pokemon2"]))
-#
-#for i in config["#pokemon2"]:
-#    wild_pokemon_type = config["#pokemon2"]["wild_pokemon_type"]
-#    print(wild_pokemon_type)
-#    print(type(i))
-#    print(i)
-#sys.exit()
+#    rate = None
 config = configparser.ConfigParser()
 config.read(conf_file)
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     a = s.connect((HOST, PORT))
     s.setblocking(False)
-    #client = Client(s, "#pokemon", ["#pokemon", "#atheism"])
-    client = Client(s, "#pokemon", channels, nick, db_file, rate, config)#, "#atheism"])
+    client = Client(s, config)
     client.connect()
     client.loop()
