@@ -307,7 +307,7 @@ class Channel(object):
             self.min_time = encounter_info[1]
             self.max_time = encounter_info[2]
             self.get_next_encounter_time()
-        elif encounter_type == "msg":
+        elif encounter_type == "message":
             self.min_message = encounter_info[1]
             self.max_message = encounter_info[2]
             self.get_next_encounter_message()
@@ -327,12 +327,13 @@ class Channel(object):
         self.ignore_players = False
 
     def is_encounter_time(self):
-        #print(self.encounter_type, time.time(), self.next_wild_time)
+        #print(self, self.encounter_type, time.time(), self.next_wild_time)
+        #print(self, self.encounter_type, self.current_privmsg, self.next_encounter_message)
         if self.encounter_type == "time":
             if int(time.time()) >= self.next_wild_time:
                 return True
             return False
-        elif self.encounter_type == "msg":
+        elif self.encounter_type == "message":
             if self.current_privmsg >= self.next_encounter_message:
                 return True
             return False
@@ -407,7 +408,7 @@ class Channel(object):
             if evolution_level != 0 and evolution_level <= level:
                 continue
             else: break
-        self.reset_next_wild()
+#        self.reset_next_wild()
 #        self.ignore_players = False
 #        self.active_players = set()
         pokemon = Pokemon(species, level)
@@ -660,8 +661,6 @@ class Client(object):
         #    print(f"c is {c}")
         #    self.channels.append(Channel(c, rate, self))
 
-        print("the channels are")
-        print(self.channels)
         self.channel = channel
         if not os.path.exists(self.db_file):
             self.create_database()
@@ -685,6 +684,8 @@ class Client(object):
             elif encounter_type == "message":
                 minimum = int(config[name].get("min_msg"))
                 maximum = int(config[name].get("max_msg"))
+                channel = Channel(self, name, (encounter_type, minimum, maximum))
+                self.channels.append(channel)
 
             else:
                 raise Exception("encounter_type not set to 'time' or 'message'")
@@ -766,7 +767,7 @@ class Client(object):
         elif player_cmd == "#heal":
             self.parse_heal(nick, split)
         elif player_cmd == "#team":
-            self.parse_team(nick)
+            self.parse_team(nick, channel, split)
         elif player_cmd == "#examine":
             self.parse_examine(nick, split)
         elif player_cmd == "#pc":
@@ -783,7 +784,46 @@ class Client(object):
             self.parse_catch(channel, nick)
         elif player_cmd == "#test":
             self.parse_test(nick)
-    
+        elif player_cmd == "#pokecount":
+            self.parse_pokecount(nick)
+
+    def parse_pokecount(self, nick):
+        abbreviations = "BLB IVY VNS CHM CHE CHZ SQU WAR BLA CAT MPD BFR WDL KAK " 
+        abbreviations += "BDR PGY PGO PGT RTA RTC SPW FRW EKS ARB PIK RAI SRW SSL "
+        abbreviations += "NDM NDO NDK NDF NDA NDQ CLF CFB VPX NTS JPF WTF ZUB GOL ODD "
+        abbreviations += "GLM VLP PRS PST VNT VMT DLT DTR MTH PRS PSD GLD MKY PRI GRW "
+        abbreviations += "ARC PWG PWL PWT ABR KDB ALA MCH MCK MCP BSP WPB VTB TCL TCR "
+        abbreviations += "GEO GRV GLM PNY RPD SLP SLB MGN MGT FFD DDU DDR SEL DWG GRM "
+        abbreviations += "MUK SHL CLY GAS HNT GEN ONX DRZ HYP KRB KNG VLT ELE EXC EXT "
+        abbreviations += "CUB MWK HML HMC LIK KOF WEZ RHH RHD CHS TNG KGK HRS SEA GLD "
+        abbreviations += "SKG SYU SME MIM SCY JYX EBZ MAG PNS TRS MKP GRD LAP DIT EVE "
+        abbreviations += "VPR JLT FLR PRG OMY OMS KAB KAT AER SLX ART ZAP MOL DTI DNR DNT MWT MEW"
+        abbreviations = abbreviations.split()
+
+        if nick not in self.player_list:
+            raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
+        player = self.get_player(nick)
+
+        self.cur.execute("SELECT * FROM pokemon WHERE trainer = ?", (player.index,))
+        results = self.cur.fetchall()
+        ever_owned = set()
+        for i in results:
+            print(i)
+            name = i[1].lower().capitalize()
+            ever_owned.add(name)
+        count_string = f"You have caught {len(ever_owned)}/151 pokemon! "
+        for e, pokemon_name in enumerate(pokemon_dict.keys()):
+            this_abbreviation = abbreviations[e]
+            if pokemon_name.lower().capitalize() not in ever_owned:
+                this_abbreviation = this_abbreviation.lower()
+            else:
+                this_abbreviation = f"\x0310{this_abbreviation}\x03"
+        #return f"\x03{color_dict[self.type]}{self.name}\x04-\x03{hp_color}{self.level}\x03"
+            count_string += this_abbreviation + " "
+        self.send_to(nick, count_string)
+                
+                
+                
     def parse_catch(self, channel, nick):
         if nick not in self.player_list:
             raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
@@ -864,8 +904,6 @@ class Client(object):
         return pokemon
 
     def sql_change_container_label(self, pokemon_id, container_label):
-        print(pokemon_id, container_label)
-        print("pkmon id container label")
         self.cur.execute("""UPDATE pokemon SET container_label = ? WHERE pokemon_id = ?""", (container_label, pokemon_id))
         self.con.commit()
     def parse_swap(self, nick, command):
@@ -951,12 +989,18 @@ class Client(object):
             self.sql_update_health(pokemon)
         self.send_to(nick, "You've healed all the pokemon in your party")
 
-    def parse_team(self, nick):
+    def parse_team(self, nick, channel, split):
         if nick not in self.player_list:
             raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
+
         player = self.get_player(nick)
+        if len(split) >= 2 and  split[1].lower() == "show" and channel:
+            dest = channel.name
+        else:
+            dest = nick
+
         letters = "ABCDEF"
-        self.send_to(nick, f"{nick}'s team: {', '.join([f'{letters[L]}:{p}|{int(p._hp/p.max_hp*100)}%' for L, p in enumerate(player.party)])}")
+        self.send_to(dest, f"{nick}'s team: {', '.join([f'{letters[L]}:{p}|{int(p._hp/p.max_hp*100)}%' for L, p in enumerate(player.party)])}")
 
     def battle(self, poke1, poke2):
         # randomness in case they have the same speed
@@ -1058,7 +1102,6 @@ class Client(object):
     def sql_evolve(self, pokemon):
         self.cur.execute("""UPDATE pokemon SET species = ?, hp = ? WHERE pokemon_id = ?""", (pokemon.name.capitalize(), pokemon._hp, pokemon.index))
         self.con.commit()
-        print("properly stored evolution changes")
     def parse_go(self, channel, nick, command):
         if nick not in self.player_list:
             raise BadChanCommand(channel.name, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
@@ -1096,6 +1139,7 @@ class Client(object):
                     self.sql_evolve(pokemon)
             #channel.reset_next_wild()
             channel.wild_pokemon = None
+            channel.reset_next_wild()
             if catch:
                 loser.captured = True
                 player.add_pokemon(loser)
@@ -1171,11 +1215,9 @@ class Client(object):
             print("KKKKKKKKKK", c)
             self.join(c.name)
         self.client_ready = True
-        print(self.client_ready)
 
 
     def sql_update_health(self, pokemon):
-        print("updating helath")
         self.cur.execute("""UPDATE pokemon SET hp = ? WHERE pokemon_id = ?""", (pokemon._hp, pokemon.index))
         self.con.commit()
         
@@ -1203,8 +1245,11 @@ class Client(object):
                 data = self.socket.recv(1024)
                 data = data.decode("utf-8")
                 data_received = True
-#            except UnicodeDecodeError:
-            except:
+                if not data:
+                    pass
+            except UnicodeDecodeError:
+                pass
+            except BlockingIOError:
                 pass
 
             if data_received:
@@ -1216,7 +1261,6 @@ class Client(object):
                 try:
                     second_arg = data[1]
                 except: continue
-                print("YYYYYYYYYYYYYY", data)
                 
                 if first_arg.lower() == "ping":
                     self.handle_ping(data)
@@ -1230,6 +1274,8 @@ class Client(object):
                     except BadPrivMsgCommand as e:
                         nick = e.nick
                         self.send_to(nick, e.text)
+                    except Exception as e:
+                        pass
             if not self.client_ready:
                 continue
             self.current_time = int(time.time())
@@ -1243,7 +1289,6 @@ class Client(object):
             
             for c in self.channels:
                 if c.is_encounter_time() and not c.wild_pokemon:
-                    print("BBBBBBBBBBB")
 #                if c.current_privmsg >= c.next_wild and not cwild_pokemon:
                     c.fainted_pokemon = None
                     c.wild_pokemon = c.make_next_wild_pokemon()
@@ -1296,7 +1341,7 @@ class Client(object):
             player.index = index
             all_trainers.append(player)
         return all_trainers
-test = True
+test = False
 if test:
     nick = "TestOak"
     db_file = "test.db"
@@ -1325,10 +1370,6 @@ else:
 #sys.exit()
 config = configparser.ConfigParser()
 config.read(conf_file)
-print(config)
-print(dir(config))
-print(config.sections())
-print(config["#pokemon2"])
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     a = s.connect((HOST, PORT))
     s.setblocking(False)
