@@ -6,6 +6,7 @@ import math
 import sqlite3
 import os
 import configparser
+import argparse
 from datetime import datetime
 HOST = "irc.alphachat.net"
 PORT = 6667
@@ -717,7 +718,7 @@ class Client(object):
     def send(self, message):
         message += "\r\n"
         to_send_back = bytes(message.encode("utf-8")) 
-        self.socket.sendall(to_send_back)
+        print("fdsafdsafdsa", to_send_back, self.socket.sendall(to_send_back))
 
     def send_to(self, recipient, message):
         if type(recipient) is Player:
@@ -1220,7 +1221,6 @@ class Client(object):
         self.cur.execute("""UPDATE pokemon SET hp = ? WHERE pokemon_id = ?""", (pokemon._hp, pokemon.index))
         self.con.commit()
         
-        #self.cur.execute("""CREATE TABLE IF NOT EXISTS pokemon (pokemon_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, species TEXT NOT NULL, trainer INTEGER, container_label TEXT,  experience INTEGER, hp INTEGER, health_iv INTEGER, attack_iv INTEGER, defense_iv INTEGER, sattack_iv INTEGER, sdefense_iv INTEGER, speed_iv INTEGER, health_ev INTEGER, attack_ev INTEGER, defense_ev INTEGER, sattack_ev INTEGER, sdefense_ev INTEGER, speed_ev INTEGER, FOREIGN KEY (trainer) REFERENCES trainers(trainer_id))""")
     def update_health_all(self):
         for player in self.players:
             for pokemon in player.party:
@@ -1229,19 +1229,60 @@ class Client(object):
                 if before != pokemon._hp:
                     self.sql_update_health(pokemon)
 
+    def check_connection(self):
+        self.send(f"PING {self.channels[0].name}")
+        self.ping_sent = True
+
+    def handle_pong(self):
+        self.pong_received = True
+
+    def reconnect_loop(self):
+        is_connected = False
+        time.sleep(1)
+        i = 0
+        while i <= 6:
+            try:
+                print(f"checking connection #{i}")
+                self.check_connection()
+                is_connected = True
+                break
+            except BlockingIOError as e:
+                print(f"check #{i} failed")
+                self.is_connected = False
+                time.sleep(30)
+            i += 1
+        return is_connected
+
     def loop(self):
+        self.is_connected = True
         self.repelling = False
         self.wild_pokemon = None
         self.fainted_pokemon = None
         wild_pokemon_time = None
-        next_heal_time = int(time.time() + 180)
+        current_time = int(time.time())
+        next_heal_time = current_time + 180
+        next_check_connection_time = current_time + 25
+        next_check_connection_time_2 = next_check_connection_time + 5
+        self.ping_sent = False
+        self.pong_received = False
         potion_time = 14400
-        next_free_potion = int(time.time()) + potion_time
-        while True:
-            
+        next_free_potion = current_time + potion_time
+        while self.is_connected:
             time.sleep(0.001)
             self.current_time = int(time.time())
-#            self.test_connection()
+            if self.current_time >= next_check_connection_time:
+                if not self.ping_sent:
+                    self.check_connection()
+                elif self.current_time >= next_check_connection_time_2:
+                    if not self.pong_received:
+                        self.is_connected = False
+                        break
+                    else:
+                        self.ping_sent = False
+                        self.pong_received = False
+                        next_check_connection_time = self.current_time + 25
+                        next_check_connection_time_2 = self.current_time + 30
+
             data_received = False
             try:
                 data = self.socket.recv(1024)
@@ -1264,11 +1305,15 @@ class Client(object):
                     second_arg = data[1]
                 except: continue
                 
+                print("data received", data)
+                
                 if first_arg.lower() == "ping":
                     self.handle_ping(data)
-                elif second_arg.lower() == "001":
+                elif second_arg and second_arg.lower() == "pong":
+                    self.handle_pong()
+                elif second_arg and second_arg.lower() == "001":
                     self.post_registration()
-                elif second_arg.lower() == "privmsg":
+                elif second_arg and second_arg.lower() == "privmsg":
                     try:
                         self.handle_privmsg(data)
                     except BadChanCommand as e:
@@ -1296,26 +1341,12 @@ class Client(object):
                     c.wild_pokemon_time = int(time.time()) + 600
                     self.send_to(c.name, f"A wild {c.wild_pokemon} appeared!")
 
-                if self.current_time >= c.wild_pokemon_time and c.wild_pokemon and c.current_privmsg > 0:
+                #if self.current_time >= c.wild_pokemon_time and c.wild_pokemon and c.current_privmsg > 0:
+                if self.current_time >= c.wild_pokemon_time and c.wild_pokemon:# and c.current_privmsg > 0:
                     self.send_to(c.name, f"The wild {c.wild_pokemon} wandered off.")
                     del c.wild_pokemon
                     c.wild_pokemon = None
                     c.reset_next_wild()
-                    #c.current_privmsg = 0
-                    #c.wild_pokemon = None
-        #self.current_privmsg += 1
-
-#            self.now = int(time.time())
-#            if not self.next_pokemon_appearance:
-#                self.next_pokemon_appearance = self.now + 10
-#            elif self.now >= self.next_pokemon_appearance:
-#                if self.wild_pokemon and not self.wild_pokemon.captured and not self.repelling:
-#                    del self.wild_pokemon
-#                if not self.repelling:
-#                    self.fainted_pokemon = None
-#                    self.wild_pokemon = self.make_next_wild_pokemon()
-#                    self.send_to(self.channel, f"A wild {self.wild_pokemon} appeared!")
-#                    self.next_pokemon_appearance = 0
 
     def create_database(self):
         self.con = sqlite3.connect(self.db_file)
@@ -1324,12 +1355,14 @@ class Client(object):
         self.cur.execute("""CREATE TABLE IF NOT EXISTS trainers (trainer_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, nick TEXT NOT NULL UNIQUE)""")
         self.cur.execute("""CREATE TABLE IF NOT EXISTS pokemon (pokemon_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, species TEXT NOT NULL, trainer INTEGER, container_label TEXT,  experience INTEGER, hp INTEGER, health_iv INTEGER, attack_iv INTEGER, defense_iv INTEGER, sattack_iv INTEGER, sdefense_iv INTEGER, speed_iv INTEGER, health_ev INTEGER, attack_ev INTEGER, defense_ev INTEGER, sattack_ev INTEGER, sdefense_ev INTEGER, speed_ev INTEGER, FOREIGN KEY (trainer) REFERENCES trainers(trainer_id))""")
         self.con.commit()
+
     def sql_add_trainer(self, nick):
         self.cur.execute(f"INSERT INTO trainers (nick) VALUES (?)", (nick,))
         self.con.commit()
         self.cur.execute(f"SELECT * FROM trainers ORDER BY trainer_id DESC LIMIT 1;")
         last_one = self.cur.fetchall()[0][0]
         return last_one
+
     def sql_get_trainers(self):
         self.cur.execute("SELECT * FROM trainers")
         all_trainers_data = self.cur.fetchall()
@@ -1341,24 +1374,21 @@ class Client(object):
             player.index = index
             all_trainers.append(player)
         return all_trainers
-test = True
-if test:
-    nick = "TestOak"
-#    db_file = "test.db"
-#    channels = ["#pokemon2"]
-    conf_file = "pokemon2.conf"
-#    rate = 3
-else:
-#    nick = "ProfOak"
-#    db_file = "pokemon.db"
-#    channels = ["#pokemon", "#atheism"]
-    conf_file = "pokemon.conf"
-#    rate = None
+
+parser = argparse.ArgumentParser(description="A CLI parser for pokebot")
+parser.add_argument("config", help="Which config file to use")
+args = parser.parse_args()
+conf_file = args.config
 config = configparser.ConfigParser()
 config.read(conf_file)
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    a = s.connect((HOST, PORT))
-    s.setblocking(False)
-    client = Client(s, config)
-    client.connect()
-    client.loop()
+def connect():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        a = s.connect((HOST, PORT))
+        s.setblocking(False)
+        client = Client(s, config)
+        client.connect()
+        client.loop()
+while True:
+    connect()
+    print("Disconnected. Will try again in five minutes")
+    time.sleep(5*60)
