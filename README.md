@@ -18,7 +18,7 @@ Configuration:
 ====
 1. `cp example.conf pokemon.conf`
 2. Change the values according to your bot
-3. Make sure you set the nick, the "db_file" 
+3. Make sure you set the nick, the "db\_file" 
 
 How to Play:
 ===
