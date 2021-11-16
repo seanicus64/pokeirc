@@ -27,6 +27,28 @@ type_dict = {
     "fighting": (["normal", "rock", "ice"],                 ["flying", "poison", "bug", "psychic"],                     ["ghost"]),
     "poison":   (["grass"],                                 ["poison", "ground", "rock", "bug"],                        []),
 }
+type_color_dict = {
+    "electric": "08",
+    "fire": "04",
+    "water": "02",
+    "grass": "09",
+    "ground": "05",
+    "rock": "14",
+    "flying": "11",
+    "normal": "00",
+    "psychic": "13",
+    "ghost": "06",
+    "dragon": "12",
+    "ice": "10",
+    "bug": "15",
+    "fighting": "03",
+    "poison": "07"
+    }
+
+
+#        color_dict = {"electric": "08", "fire": "04", "water": "02", "grass": "09", "ground": "05", "rock": "14", 
+#            "flying": "11", "normal": "00", "psychic": "13", "ghost": "06", "dragon": "12", "ice": "10", "bug": "15", "fighting": "03", "poison": "07"}
+#        return f"\x03{color_dict[self.type]}{self.name}\x03-\x03{hp_color}{self.level}\x03"
 """Notable changes from gen 1:
     Pokemon only have 1 type
     Type advantages use Generation 2 fixes (bug weak against poison, poison not strong against bug, 
@@ -577,9 +599,9 @@ class Pokemon(object):
             hp_color = "08"
         else:
             hp_color = "04"
-        color_dict = {"electric": "08", "fire": "04", "water": "02", "grass": "09", "ground": "05", "rock": "14", 
-            "flying": "11", "normal": "00", "psychic": "13", "ghost": "06", "dragon": "12", "ice": "10", "bug": "15", "fighting": "03", "poison": "07"}
-        return f"\x03{color_dict[self.type]}{self.name}\x03-\x03{hp_color}{self.level}\x03"
+#        color_dict = {"electric": "08", "fire": "04", "water": "02", "grass": "09", "ground": "05", "rock": "14", 
+#            "flying": "11", "normal": "00", "psychic": "13", "ghost": "06", "dragon": "12", "ice": "10", "bug": "15", "fighting": "03", "poison": "07"}
+        return f"\x03{type_color_dict[self.type]}{self.name}\x03-\x03{hp_color}{self.level}\x03"
 
 
 class ReconstructedPokemon(Pokemon):
@@ -620,12 +642,14 @@ class ReconstructedPokemon(Pokemon):
 class Client(object):
     #TODO: QUIT messages, handling timeouts
     def __init__(self, socket, config):
+        print("creating Client")
         self.socket = socket
         self.now = int(time.time())
         self.next_pokemon_appearance = None
         self.players = []
         self.channels = []
         self.parse_config(config)
+        print("config has been parsed")
         self.client_ready = False
 
         if not os.path.exists(self.db_file):
@@ -687,6 +711,7 @@ class Client(object):
     def send(self, message):
         message += "\r\n"
         to_send_back = bytes(message.encode("utf-8")) 
+        self.socket.send(to_send_back)
 
     def send_to(self, recipient, message):
         if type(recipient) is Player:
@@ -749,6 +774,34 @@ class Client(object):
             self.parse_test(nick)
         elif player_cmd == "#pokecount":
             self.parse_pokecount(nick)
+        elif player_cmd == "#pokedex":
+            self.parse_pokedex(nick, split)
+    
+    def parse_pokedex(self, nick, command):
+        if nick not in self.player_list:
+            raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
+        player = self.get_player(nick)
+        if not len(command) >= 2:
+            raise BadPrivMsgCommand(nick, f"Syntax: #pokedex <pokemon_species>")
+        which_pokemon = command[1].lower().capitalize()
+        pokemon_values = pokemon_dict.get(which_pokemon)
+        if not pokemon_values:
+            raise BadPrivMsgCommand(nick, f"Non existent pokemon: {which_pokemon}")
+        idx, pkmn_type, rarity, growth, base_exp, stats, evolution, min_level = pokemon_values
+        hp, att, _def, satt, sdef, spd = stats
+        o = "\x0307" # orange
+        g = "\x0309" # light green
+        c = "\x0311" # cyan
+        n = "\x0300"
+        type_color = "\x03" + f"{type_color_dict[pkmn_type]}"
+        growth_rate_text = {0: "fast", 1: "medium-fast", 2: "medium-slow", 3: "slow"}[growth]
+        rarity_text = {0: "common", 1: "average", 2: "rare", 3: "legendary"}[rarity]
+        string =  f"#{idx}: {type_color}{which_pokemon}[{pkmn_type}] {g}Rarity{n}:{rarity_text} {g}lowest_level:{min_level} "
+        string += f"{c}growth_rate{n}:{growth_rate_text} {o}base_exp{n}:{base_exp} {o}base_hp{n}:{hp} {o}base_att{n}:{att} "
+        string += f"{o}base_def{n}:{_def} {o}base_spec_att{n}:{satt} {o}base_spec_def{n}:{sdef} {o}base_speed{n}:{spd} "
+        if evolution[0] != "XXXXXXX":
+            string += f". Evolves into {evolution[0]} at level {evolution[1]}."
+        self.send_to(nick, string)
 
     def parse_pokecount(self, nick):
         abbreviations = "BLB IVY VNS CHM CHE CHZ SQU WAR BLA CAT MPD BFR WDL KAK " 
@@ -842,7 +895,7 @@ class Client(object):
         self.send_to(channel, f"{nick} set a repel.  Pokemon won't appear for another half hour.")
 
     def parse_commands(self, nick):
-        self.send_to(nick, "#starter #go #examine #team #pc #swap #repel #release #catch #commands") #TODO: pokedex
+        self.send_to(nick, "#starter #go #examine #team #pc #swap #repel #release #catch #commands #pokecount #pokedex") #TODO: pokedex
 
     def parse_test(self, nick):
         raise BadPrivMsgCommand(nick, "This is a test")
@@ -1164,6 +1217,7 @@ class Client(object):
         self.con.commit()
 
     def post_registration(self):
+        print("Connected to network.")
         for c in self.channels:
             self.join(c.name)
         self.client_ready = True
@@ -1243,7 +1297,6 @@ class Client(object):
                 if not gave_potion:
                     self.give_out_potions()
                     gave_potion = True
-                    print("giving out potions")
                 else:
                     gave_potion = False
 
@@ -1259,6 +1312,8 @@ class Client(object):
                 pass
             except BlockingIOError:
                 pass
+            except Exception as e:
+                print(e)
 
             if data_received:
                 data = data.lstrip(":")
@@ -1269,8 +1324,6 @@ class Client(object):
                 try:
                     second_arg = data[1]
                 except: continue
-                
-                print("data received", data)
                 
                 if first_arg.lower() == "ping":
                     self.handle_ping(data)
@@ -1353,8 +1406,10 @@ def connect():
         a = s.connect((HOST, PORT))
         s.setblocking(False)
         client = Client(s, config)
+        time.sleep(0.2)
         client.connect()
         client.loop()
+        
 while True:
     connect()
     print("Disconnected. Will try again in five minutes")
