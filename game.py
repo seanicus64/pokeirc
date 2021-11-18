@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import traceback
 import sys
 import socket
 import random
@@ -98,14 +99,14 @@ starters = (
 
 pokemon_dict = {
     # name              idx     type         rare,grth,bexp     hp  att def satt sdef spd      evolution    lvl
-    "Bulbasaur":        (1,     "grass",        1,2,64,         (45, 49, 49,  65,  65, 45),  ("Ivysaur",     16),    8),
-    "Ivysaur":          (2,     "grass",        1,2,141,        (60, 62, 63,  80,  80, 60),  ("Venusaur",     32),   16),
+    "Bulbasaur":        (1,     "grass",        2,2,64,         (45, 49, 49,  65,  65, 45),  ("Ivysaur",     16),    8),
+    "Ivysaur":          (2,     "grass",        2,2,141,        (60, 62, 63,  80,  80, 60),  ("Venusaur",     32),   16),
     "Venusaur":         (3,     "grass",        2,2,208,        (80, 82, 83, 100, 100, 80),  ("XXXXXXX",     0),     32),
-    "Charmander":       (4,     "fire",         1,2,65,         (39, 52, 43, 60, 50, 65),  ("Charmeleon",     16),   8),
-    "Charmeleon":        (5,     "fire",         1,2,142,        (58, 64, 58, 80, 65, 80),  ("Charizard",     36),   16),
+    "Charmander":       (4,     "fire",         2,2,65,         (39, 52, 43, 60, 50, 65),  ("Charmeleon",     16),   8),
+    "Charmeleon":        (5,     "fire",         2,2,142,        (58, 64, 58, 80, 65, 80),  ("Charizard",     36),   16),
     "Charizard":        (6,     "fire",         2,2,209,        (78, 84, 78, 109, 85, 100),  ("XXXXXXX",     0),     32),
-    "Squirtle":         (7,     "water",        1,2,66,         (44, 48, 65, 50, 64, 43),  ("Wartortle",     16),    8),
-    "Wartortle":        (8,     "water",        1,2,143,        (59, 63, 80, 65, 80, 58),  ("Blastoise",     36),    16),
+    "Squirtle":         (7,     "water",        2,2,66,         (44, 48, 65, 50, 64, 43),  ("Wartortle",     16),    8),
+    "Wartortle":        (8,     "water",        2,2,143,        (59, 63, 80, 65, 80, 58),  ("Blastoise",     36),    16),
     "Blastoise":        (9,     "water",        2,2,210,        (79, 83, 100, 85, 105, 78),  ("XXXXXXX",     0),     32),
     "Caterpie":         (10,     "bug",         0,1,53,         (45, 30, 35, 20, 20, 45),  ("Metapod",     7),       2),
     "Metapod":          (11,     "bug",         0,1,72,         (50, 20, 55, 25, 25, 30),  ("Butterfree",    10),    7),
@@ -151,8 +152,8 @@ pokemon_dict = {
     "Dugtrio":          (51,     "ground",      1,1,153,        (35, 100, 50, 50, 70, 120),  ("XXXXXXX",     0),     26),
     "Meowth":           (52,     "normal",      1,1,69,         (40, 45, 35, 40, 40, 90),  ("Persian",     28),      8),
     "Persian":          (53,     "normal",      1,1,148,        (65, 70, 60, 65, 65, 115),  ("XXXXXXX",     0),      28),
-    "Psyduck":          (54,     "water",       1,1,80,         (50, 52, 48, 65, 50, 55),  ("Golduck",     33),      10),
-    "Golduck":          (55,     "water",       1,1,174,        (80, 82, 78, 95, 80, 85),  ("XXXXXXX",     0),       33),
+    "Psyduck":          (54,     "psychic",       1,1,80,         (50, 52, 48, 65, 50, 55),  ("Golduck",     33),      10),
+    "Golduck":          (55,     "psychic",       1,1,174,        (80, 82, 78, 95, 80, 85),  ("XXXXXXX",     0),       33),
     "Mankey":           (56,     "fighting",    1,1,74,         (40, 80, 35, 35, 45, 70),  ("Primeape",     28),     8),
     "Primeape":         (57,     "fighting",    1,1,149,        (65, 105, 60, 60, 70, 85),  ("XXXXXXX",     0),      28),
     "Growlithe":        (58,     "fire",        1,3,91,         (55, 70, 45, 70, 50, 60),  ("Arcanine",     30),     10), # added
@@ -472,6 +473,7 @@ class Pokemon(object):
         self.sattack_ev = 0
         self.sdefense_ev = 0
         self.speed_ev = 0
+        self.times_evolved = 0
         self.hp()
         self._hp = self.max_hp
         self.attack()
@@ -530,9 +532,14 @@ class Pokemon(object):
         return exp_change
 
     def evolve(self):
+        print("ccccccccC")
         self.name = self.evolution
         self.get_stats()
+        print("DDDDDDD")
         self._hp = self.max_hp
+        self.times_evolved += 1
+        print("EEEEEEEE")
+
         
     def check_level(self):
         if self.growth_rate == 3: # fast
@@ -557,6 +564,7 @@ class Pokemon(object):
             self.special_defense()
             self.speed()
             if self.level >= self.evolution_level and self.evolution != "XXXXXXX":
+                print("AAAAAAAA")
                 self.evolve()
             return level
         else:
@@ -605,7 +613,7 @@ class Pokemon(object):
 
 
 class ReconstructedPokemon(Pokemon):
-    def __init__(self, index, species, trainer, container_label, exp, hp, health_iv, attack_iv, defense_iv, sattack_iv, sdefense_iv, speed_iv, health_ev, attack_ev, defense_ev, sattack_ev, sdefense_ev, speed_ev):
+    def __init__(self, index, species, trainer, container_label, exp, hp, health_iv, attack_iv, defense_iv, sattack_iv, sdefense_iv, speed_iv, health_ev, attack_ev, defense_ev, sattack_ev, sdefense_ev, speed_ev, times_evolved):
         self.container_label = container_label
         self.index = index
         self.name = species
@@ -624,6 +632,7 @@ class ReconstructedPokemon(Pokemon):
         self.sattack_ev = sattack_ev
         self.sdefense_ev = sdefense_ev
         self.speed_ev = speed_ev
+        self.times_evolved = times_evolved
         self.get_stats()
         self.captured = True
         # This is just random.  I'm not going to implement a faithful attack system.
@@ -706,6 +715,7 @@ class Client(object):
 
     def join(self, channel):
         message = f"JOIN {channel}"
+        print(message)
         self.send(message)
     
     def send(self, message):
@@ -803,6 +813,41 @@ class Client(object):
             string += f". Evolves into {evolution[0]} at level {evolution[1]}."
         self.send_to(nick, string)
 
+    def count_pokemon(self, player):
+        
+        self.cur.execute("SELECT * FROM pokemon WHERE trainer = ?", (player.index,))
+        results = self.cur.fetchall()
+        ever_owned = set()
+        for i in results:
+            name = i[1].lower().capitalize()
+            times_evolved = i[18]
+            prevs = []
+            known_about = [name]
+            while times_evolved > 0:
+                print(known_about)
+                print(prevs)
+                print(ever_owned)
+                print(times_evolved)
+                for k in list(reversed(pokemon_dict.keys())):
+                    print(k)
+                    possible_preevolve = k
+                    data = pokemon_dict[k]
+                    print(data)
+                    evolution = data[6]
+                    print(evolution)
+                    if evolution[0].lower().capitalize() in known_about:
+                        print("is in known_about")
+                        known_about.append(possible_preevolve.lower().capitalize())
+                        
+                        prevs.append(possible_preevolve)
+                        ever_owned.add(possible_preevolve)
+                        times_evolved -= 1
+
+            print(times_evolved)
+
+            ever_owned.add(name)
+        amount = len(ever_owned)
+        return ever_owned
     def parse_pokecount(self, nick):
         abbreviations = "BLB IVY VNS CHM CHE CHZ SQU WAR BLA CAT MPD BFR WDL KAK " 
         abbreviations += "BDR PGY PGO PGT RTA RTC SPW FRW EKS ARB PIK RAI SRW SSL "
@@ -819,13 +864,8 @@ class Client(object):
         if nick not in self.player_list:
             raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
         player = self.get_player(nick)
-
-        self.cur.execute("SELECT * FROM pokemon WHERE trainer = ?", (player.index,))
-        results = self.cur.fetchall()
-        ever_owned = set()
-        for i in results:
-            name = i[1].lower().capitalize()
-            ever_owned.add(name)
+        
+        ever_owned = self.count_pokemon(player)
         count_string = f"You have caught {len(ever_owned)}/151 pokemon! "
         for e, pokemon_name in enumerate(pokemon_dict.keys()):
             this_abbreviation = abbreviations[e]
@@ -850,9 +890,14 @@ class Client(object):
                 channel.fainted_pokemon.container_label = container_label
                 pokemon_id = self.sql_add_pokemon(channel.fainted_pokemon, player)
                 channel.fainted_pokemon.index = pokemon_id
-
+                before = len(self.count_pokemon(player))
                 self.sql_update_pokemon(channel.fainted_pokemon)
-                self.send_to(channel.name, f"{nick} caught the {channel.fainted_pokemon}")
+                after = len(self.count_pokemon(player))
+                message = f"{nick} caught the {channel.fainted_pokemon}."
+                if before != after:
+                    message += f" {nick} has caught {after} pokemon!"
+                self.send_to(channel.name, message)
+#                self.send_to(channel.name, f"{nick} caught the {channel.fainted_pokemon}. {nick} now caught {self.count_pokemon(player)} pokemon!")
                 channel.fainted_pokemon = None
         else:
             raise BadPrivMsgCommand(nick, f"{nick}: There is no pokemon to catch.  Are you confused?")
@@ -1109,7 +1154,8 @@ class Client(object):
         return index, which_container, pokemon
 
     def sql_evolve(self, pokemon):
-        self.cur.execute("""UPDATE pokemon SET species = ?, hp = ? WHERE pokemon_id = ?""", (pokemon.name.capitalize(), pokemon._hp, pokemon.index))
+        print("BBBBBBBB")
+        self.cur.execute("""UPDATE pokemon SET species = ?, hp = ?, times_evolved = ? WHERE pokemon_id = ?""", (pokemon.name.capitalize(), pokemon._hp, pokemon.times_evolved, pokemon.index))
         self.con.commit()
 
     def parse_go(self, channel, nick, command):
@@ -1204,7 +1250,8 @@ class Client(object):
         sattack_ev = pokemon.sattack_ev
         sdefense_ev = pokemon.sdefense_ev
         speed_ev = pokemon.speed_ev
-        self.cur.execute("""INSERT INTO pokemon (species, trainer, container_label, experience, hp, health_iv, attack_iv, defense_iv, sattack_iv, sdefense_iv, speed_iv, health_ev, attack_ev, defense_ev, sattack_ev, sdefense_ev, speed_ev) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (species, trainer, container_label, experience, hp, health_iv, attack_iv, defense_iv, sattack_iv, sdefense_iv, speed_iv, health_ev, attack_ev, defense_ev, sattack_ev, sdefense_ev, speed_ev))
+        times_evolved = pokemon.times_evolved
+        self.cur.execute("""INSERT INTO pokemon (species, trainer, container_label, experience, hp, health_iv, attack_iv, defense_iv, sattack_iv, sdefense_iv, speed_iv, health_ev, attack_ev, defense_ev, sattack_ev, sdefense_ev, speed_ev, times_evolved) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (species, trainer, container_label, experience, hp, health_iv, attack_iv, defense_iv, sattack_iv, sdefense_iv, speed_iv, health_ev, attack_ev, defense_ev, sattack_ev, sdefense_ev, speed_ev, times_evolved))
         self.con.commit()
         self.cur.execute("""SELECT pokemon_id FROM pokemon ORDER BY pokemon_id DESC LIMIT 1;""")
         results = self.cur.fetchall()
@@ -1340,6 +1387,12 @@ class Client(object):
                         nick = e.nick
                         self.send_to(nick, e.text)
                     except Exception as e:
+                        exception_type, exception_object, exception_traceback = sys.exc_info()
+                        line_number = exception_traceback.tb_lineno
+                        print(exception_type, exception_object, exception_traceback)
+                        print(line_number)
+                        print(e)
+                        print(traceback.format_exc())
                         pass
             if not self.client_ready:
                 continue
@@ -1371,7 +1424,7 @@ class Client(object):
         self.con.execute("PRAGMA foreign_keys = 1")
         self.cur = self.con.cursor()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS trainers (trainer_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, nick TEXT NOT NULL UNIQUE)""")
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS pokemon (pokemon_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, species TEXT NOT NULL, trainer INTEGER, container_label TEXT,  experience INTEGER, hp INTEGER, health_iv INTEGER, attack_iv INTEGER, defense_iv INTEGER, sattack_iv INTEGER, sdefense_iv INTEGER, speed_iv INTEGER, health_ev INTEGER, attack_ev INTEGER, defense_ev INTEGER, sattack_ev INTEGER, sdefense_ev INTEGER, speed_ev INTEGER, FOREIGN KEY (trainer) REFERENCES trainers(trainer_id))""")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS pokemon (pokemon_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, species TEXT NOT NULL, trainer INTEGER, container_label TEXT,  experience INTEGER, hp INTEGER, health_iv INTEGER, attack_iv INTEGER, defense_iv INTEGER, sattack_iv INTEGER, sdefense_iv INTEGER, speed_iv INTEGER, health_ev INTEGER, attack_ev INTEGER, defense_ev INTEGER, sattack_ev INTEGER, sdefense_ev INTEGER, speed_ev INTEGER, times_evolved INTEGER DEFAULT 0, FOREIGN KEY (trainer) REFERENCES trainers(trainer_id))""")
         self.con.commit()
 
     def sql_add_trainer(self, nick):
