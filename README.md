@@ -64,4 +64,8 @@ Commands:
 * `#release <pokemon_label> <pokemon_name>`: Releases your pokemon into the wild.  `<pokemon_label>` is necessary to prevent you from making mistakes.
 * `#heal <pokemon_name>`: Heals one of your pokemon with a potion.  You only get 5 potions a day: use them wisely.
 * `#pokecount`: Tells you how many pokemon you've caught as well as a list of the ones you have and haven't caught.  For simplicity each pokemon's name is reduced to 3 characters, but they are in the order as the gen1 pokedex.
-* `#commands`: Shows a brief summary of these commands
+* `#challenge <player>`: Challenges the other player to a trainer battle.
+* `#challenge-accept`: Accepts a challenge for a battle.
+* `#challenge-decline`: Declines a challenge for a battle.
+* `#commands`: Shows a brief summary of these commands.
+
