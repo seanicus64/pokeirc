@@ -1358,7 +1358,14 @@ class Client(object):
         self.con.commit()
         
     def update_health_all(self):
+        in_battles = set()
+        for c in self.channels:
+            if c.challenge and c.challenge["phase"] != "prebattle":
+                in_battles.add(c.challenge["challenger"])
+                in_battles.add(c.challenge["challenged"])
         for player in self.players:
+            if player in in_battles:
+                continue
             for pokemon in player.party:
                 before = pokemon._hp
                 pokemon.increase_health_five_percent()
