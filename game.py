@@ -825,7 +825,7 @@ class Client(object):
         if channel.challenge:
             raise BadChanCommand(channel.name, f"There is already a battle challenge in this channel")
         player2 = self.get_player(nick2)
-        timeout = 60
+        timeout = 180
         channel.challenge = {"challenger": player, "challenged": player2, "pokemon1": None, "pokemon2": None, "timeout": int(time.time()) + timeout, "phase": "prebattle"}
 
         self.send_to(channel.name, f"{nick} has challenged {nick2} to a battle! {nick2} has {timeout} seconds to #challenge-accept or #challenge-decline.")
@@ -1145,6 +1145,7 @@ class Client(object):
             defense = defender._sdefense
         random_multiplier = random.randrange(85, 100) / 100
         damage = int(((((2 * attacker.level) / 5 + 2) * power * (attack/defense))/50 + 2) * random_multiplier * stab * type_effectiveness)
+        damage = max(1, damage)
         defender._hp -= damage
         defender._hp = max(defender._hp, 0)
 
