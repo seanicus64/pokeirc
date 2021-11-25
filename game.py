@@ -167,8 +167,8 @@ pokemon_dict = {
     "Bellsprout":       (69,     "grass",       1,2,84,         (50, 75, 35, 70, 30, 40),  ("Weepinbell",     21),   8),
     "Weepinbell":       (70,     "grass",       1,2,151,        (65, 90, 50, 85, 45, 55),  ("Victreebell",     40),  21), #added
     "Victreebel":       (71,     "grass",       2,2,191,        (80, 105, 65, 100, 70, 70),  ("XXXXXXX",     0),     40),
-    "Tentacool":        (72,     "grass",       1,3,105,        (40, 40, 35, 50, 100, 70),  ("Tentacruel",     30),  10),
-    "Tentacruel":       (73,     "grass",       1,3,205,        (80, 70, 65, 80, 120, 100),  ("XXXXXXX",     0),     30),
+    "Tentacool":        (72,     "water",       1,3,105,        (40, 40, 35, 50, 100, 70),  ("Tentacruel",     30),  10),
+    "Tentacruel":       (73,     "water",       1,3,205,        (80, 70, 65, 80, 120, 100),  ("XXXXXXX",     0),     30),
     "Geodude":          (74,     "rock",        1,2,86,         (40, 80, 100, 30, 30, 20),  ("Graveler",     25),    9),
     "Graveler":         (75,     "rock",        1,2,134,        (55, 95, 115, 45, 45, 35),  ("Golem",     45),       25), #added
     "Golem":            (76,     "rock",        2,2,177,        (80, 120, 130, 55, 65, 45),  ("XXXXXXX",     0),     45),
