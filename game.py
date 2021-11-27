@@ -862,6 +862,7 @@ class Client(object):
         
         self.cur.execute("SELECT * FROM pokemon WHERE trainer = ?", (player.index,))
         results = self.cur.fetchall()
+        print(results)
         ever_owned = set()
         for i in results:
             name = i[1].lower().capitalize()
@@ -923,14 +924,18 @@ class Client(object):
                 channel.fainted_pokemon.captured = True
                 container_label = player.get_container_label(channel.fainted_pokemon)
                 channel.fainted_pokemon.container_label = container_label
+                before = len(self.count_pokemon(player))
                 pokemon_id = self.sql_add_pokemon(channel.fainted_pokemon, player)
                 channel.fainted_pokemon.index = pokemon_id
-                before = len(self.count_pokemon(player))
                 self.sql_update_pokemon(channel.fainted_pokemon)
                 after = len(self.count_pokemon(player))
                 message = f"{nick} caught the {channel.fainted_pokemon}."
+                print("before, after")
+                print(before, after)
                 if before != after:
-                    message += f" {nick} has caught {after} pokemon!"
+                    print(before, after)
+
+                    message += f" {nick} has caught {after}/151 pokemon!"
                 self.send_to(channel.name, message)
 #                self.send_to(channel.name, f"{nick} caught the {channel.fainted_pokemon}. {nick} now caught {self.count_pokemon(player)} pokemon!")
                 channel.fainted_pokemon = None
@@ -1268,6 +1273,7 @@ class Client(object):
             winner = pokemon2
             loser = pokemon1
         exp = winner.gain_experience(loser)
+        winner.game_ev(loser)
         winner_before_str = str(winner)
         before_name = winner.name
         level = winner.check_level()
