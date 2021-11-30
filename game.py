@@ -491,17 +491,23 @@ class Pokemon(object):
         self.evolution, self.evolution_level  = self.stats[6]
         self.lowest_level = self.stats[7]
 
-    def get_experience(self):
+    def get_experience(self, level=None):
+        if not level:
+            level = self.level
+            update = True
+        else:
+            update = False
         if self.growth_rate == 0:
-            exp = (5 * self.level ** 3)/4
+            exp = (5 * level ** 3)/4
         elif self.growth_rate == 1:
-            exp = (6/5)*self.level**3 - 15 * self.level**2 + 100 * self.level - 140
+            exp = (6/5)*level**3 - 15 * level**2 + 100 * level - 140
         elif self.growth_rate == 2:
-            exp = self.level**3
+            exp = level**3
         elif self.growth_rate == 3:
-            exp = (4 * self.level**3)/5
-        self.exp = int(exp)
-        return exp
+            exp = (4 * level**3)/5
+        if update:
+            self.exp = int(exp)
+        return int(exp)
 
     def gain_ev(self, loser):
         # TODO: set max for these
@@ -1043,8 +1049,16 @@ class Client(object):
             raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
         player = self.get_player(nick)
         message = ""
-        for num, pokemon in enumerate(player.stored):
-            message += f"{num}:{pokemon} "
+        beginning = max(0, len(player.stored)-10)
+        print(beginning)
+        for i in range(beginning, min(beginning+10, len(player.stored))):
+            print(i)
+#            if i >= len(player.stored)-1:
+#                break
+            message += f"{i}:{player.stored[i]} "
+            print(message)
+#        for num, pokemon in enumerate(player.stored):
+#            message += f"{num}:{pokemon} "
         self.send_to(nick, message)
 
     def parse_examine(self, nick, command):
@@ -1054,12 +1068,16 @@ class Client(object):
             raise BadPrivMsgCommand(nick, f"{nick}: Syntax: #examine <pokemon>")
         player = self.get_player(nick)
         index, container, pkmn = self.get_pokemon(command[1].lower(), player)
+        exp_to_next_level = pkmn.get_experience(pkmn.level+1) - pkmn.exp
+        if pkmn.level == 100:
+            exp_to_next_level = "N/A"
+
         growth_dict = {0: "slow", 1: "medium-slow", 2: "medium-fast", 3: "fast"}
         message = f"{pkmn.name} \x0300Lvl\x03:{pkmn.level} \x0300EXP\x03:{pkmn.exp} \x0300HP\x03:{pkmn._hp} \x0300MaxHP\x03:{pkmn.max_hp} \x0300Health\x03:{int(pkmn._hp/pkmn.max_hp*100)}% "
         message += f"\x0304Att\x03:{pkmn._attack} \x0304Def\x03:{pkmn._defense} \x0304SAtt\x03:{pkmn._sattack} \x0304SDef\x03:{pkmn._sdefense} \x0304Spd\x03:{pkmn._speed} "
         message += f"\x0302h_iv\x03:{pkmn.health_iv} \x0302a_iv\x03:{pkmn.attack_iv} \x0302d_iv\x03:{pkmn.defense_iv} \x0302sa_iv\x03:{pkmn.sattack_iv} \x0302sd_iv\x03:{pkmn.sdefense_iv} \x0302spd_iv\x03:{pkmn.speed_iv} "
         message += f"\x0303h_ev\x03:{pkmn.health_ev} \x0303a_ev\x03:{pkmn.attack_ev} \x0303d_ev\x03:{pkmn.defense_ev} \x0303sa_ev\x03:{pkmn.sattack_ev} \x0303sd_ev\x03:{pkmn.sdefense_ev} \x0303spd_ev\x03:{pkmn.speed_ev} "
-        message += f"\x0300GrowthRate\x03:{growth_dict[pkmn.growth_rate]}"
+        message += f"\x0308GrowthRate\x03:{growth_dict[pkmn.growth_rate]} \x0308ExpToNextLevel\x03:{exp_to_next_level}\x03"
         self.send_to(nick, message)
 
     def heal_pokemon(self, pokemon):
@@ -1273,7 +1291,8 @@ class Client(object):
             winner = pokemon2
             loser = pokemon1
         exp = winner.gain_experience(loser)
-        winner.game_ev(loser)
+        print(f"EXP IS NOW {exp} {winner.exp}")
+        winner.gain_ev(loser)
         winner_before_str = str(winner)
         before_name = winner.name
         level = winner.check_level()
@@ -1373,7 +1392,7 @@ class Client(object):
         for player in self.players:
             if player in in_battles:
                 continue
-            for pokemon in player.party:
+            for pokemon in player.party + player.stored:
                 before = pokemon._hp
                 pokemon.increase_health_five_percent()
                 if before != pokemon._hp:
