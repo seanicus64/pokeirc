@@ -1044,12 +1044,15 @@ class Client(object):
         self.sql_change_container_label(second_pokemon.index, container_label_2)
         self.send_to(nick, message)
 
-    def parse_pc(self, nick):
+    def parse_pc(self, nick, command):
         if nick not in self.player_list:
             raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
         player = self.get_player(nick)
         message = ""
-        beginning = max(0, len(player.stored)-10)
+        if len(command) == 2 and command[1].isdigit():
+            beginning = max(0, min(len(player.stored)-10, int(command[1])))
+        else:
+            beginning = max(0, len(player.stored)-10)
         print(beginning)
         for i in range(beginning, min(beginning+10, len(player.stored))):
             print(i)
