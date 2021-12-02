@@ -9,6 +9,7 @@ import sqlite3
 import os
 import configparser
 import argparse
+import queue
 from datetime import datetime
 type_dict = {
     #           2X effective                                1/2 effective                                               0 effective
@@ -425,9 +426,45 @@ class Player(object):
         self.name = name
         self.party = []
         self.stored = []
+        self.recently_swapped = queue.Queue(10)
+        #TODO: store in database
         self.potions = 5
         #TODO recreate player with potions and pokeballs
 
+    def get_queue_contents(self):
+        removed = []
+        while not self.recently_swapped.empty():
+            retrieved = self.recently_swapped.get()
+            removed.append(retrieved)
+        for r in removed:
+            self.recently_swapped.put(r)
+        return removed
+
+    def add_to_queue(self, pokemon):
+        contents = self.get_queue_contents()
+        # Don't want to put the same pokemon in twice.
+        if pokemon in contents:
+            return False
+        if self.recently_swapped.full():
+            self.recently_swapped().get()
+        self.recently_swapped.put(pokemon)
+
+    def show_queue(self):
+        recent_swap_string = ""
+        contents = self.get_queue_contents()
+        for pkmn in contents:
+            recent_swap_string += f" {pkmn.container_label}:{pkmn}"
+        return recent_swap_string.strip()
+#        removed = []
+#        while not self.recently_swapped.empty():
+#            retrieved = self.recently_swapped.get()
+#            removed.append(retrieved)
+#            recent_swap_string += f" {retrieved.container_label}:{retrieved}"
+#        for r in removed:
+#            self.recently_swapped.put(r)
+        
+
+        return recent_swap_string
     def increment_potions(self):
         self.potions += 1
         self.potions = min(5, self.potions)
@@ -518,7 +555,11 @@ class Pokemon(object):
         self.sdefense_ev += loser.base_sdef
         self.speed_ev += loser.base_spd
         
-        
+    def get_pokemon_identifier(self):
+        """Creates a more interesting pokemon ID number than counting up from 0. Only useful for the player,
+        not for the actual mechanics of the game."""
+        return str(hash( str(self.index) ) %10000).zfill(4)
+
     def gain_experience(self, loser):
         a = 1.5 if self.captured else 1
         t = 1 # 1.5 if pokemon was traded
@@ -767,7 +808,7 @@ class Client(object):
         elif player_cmd == "#examine":
             self.parse_examine(nick, split)
         elif player_cmd == "#pc":
-            self.parse_pc(nick)
+            self.parse_pc(nick, split)
         elif player_cmd == "#swap":
             self.parse_swap(nick, split)
         elif player_cmd == "#repel" and channel:
@@ -790,6 +831,35 @@ class Client(object):
             self.parse_challenge_accept(channel, nick)
         elif player_cmd == "#challenge-decline":
             self.parse_challenge_decline(channel, nick)
+        elif player_cmd == "#pokefind":
+            self.parse_pokefind(nick, split)
+
+    def parse_pokefind(self, nick, command):
+        if nick not in self.player_list:
+            raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
+        player = self.get_player(nick)
+        if len(command) < 2:
+            raise BadPrivMsgCommand(nick, f"Syntax: #pokefind <species name>")
+        search_term = command[1].capitalize()
+        if search_term not in pokemon_dict.keys():
+            raise BadPrivMsgCommand(nick, f"There is no pokemon species with the name '{search_term}'")
+        party_string = ""
+        for pokemon in player.party:
+            if pokemon.name.capitalize() == search_term:
+                party_string += f" {pokemon.container_label}:{pokemon}#{pokemon.get_pokemon_identifier()}"
+        team_string = ""
+        for pokemon in player.stored:
+            if pokemon.name.capitalize() == search_term:
+                party_string += f" {pokemon.container_label}:{pokemon}#{pokemon.get_pokemon_identifier()}"
+        both = f"{party_string} {team_string}".strip()
+        if not both:
+            self.send_to(player, f"Sorry, you don't have any {search_term}")
+        else:
+            self.send_to(player, both)
+
+            
+            
+            
 
     def parse_challenge_accept(self, channel, nick):
         if nick not in self.player_list:
@@ -1040,21 +1110,30 @@ class Client(object):
         message = f"{nick} swapped {first_pokemon} with {second_pokemon}"
         container_label_1 = player.get_container_label(first_pokemon)
         container_label_2 = player.get_container_label(second_pokemon)
+        first_pokemon.container_label = container_label_1
+        second_pokemon.container_label = container_label_2
+        
         self.sql_change_container_label(first_pokemon.index, container_label_1)
         self.sql_change_container_label(second_pokemon.index, container_label_2)
+        if first_container != second_container:
+        #    if first_container == player.stored:
+                player.add_to_queue(second_pokemon)
+        #    else:
+                player.add_to_queue(first_pokemon)
         self.send_to(nick, message)
 
     def parse_pc(self, nick, command):
         if nick not in self.player_list:
             raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
+        amount_to_show = 20
         player = self.get_player(nick)
         message = ""
         if len(command) == 2 and command[1].isdigit():
-            beginning = max(0, min(len(player.stored)-10, int(command[1])))
+            beginning = max(0, min(len(player.stored)-amount_to_show, int(command[1])))
         else:
-            beginning = max(0, len(player.stored)-10)
+            beginning = max(0, len(player.stored)-amount_to_show)
         print(beginning)
-        for i in range(beginning, min(beginning+10, len(player.stored))):
+        for i in range(beginning, min(beginning+amount_to_show, len(player.stored))):
             print(i)
 #            if i >= len(player.stored)-1:
 #                break
@@ -1062,7 +1141,11 @@ class Client(object):
             print(message)
 #        for num, pokemon in enumerate(player.stored):
 #            message += f"{num}:{pokemon} "
+    
+        recently_swapped_string = player.show_queue()
         self.send_to(nick, message)
+        if recently_swapped_string:
+            self.send_to(nick, f"Recently swapped: {recently_swapped_string}")
 
     def parse_examine(self, nick, command):
         if nick not in self.player_list:
@@ -1071,12 +1154,13 @@ class Client(object):
             raise BadPrivMsgCommand(nick, f"{nick}: Syntax: #examine <pokemon>")
         player = self.get_player(nick)
         index, container, pkmn = self.get_pokemon(command[1].lower(), player)
+        ID = pkmn.get_pokemon_identifier()
         exp_to_next_level = pkmn.get_experience(pkmn.level+1) - pkmn.exp
         if pkmn.level == 100:
             exp_to_next_level = "N/A"
 
         growth_dict = {0: "slow", 1: "medium-slow", 2: "medium-fast", 3: "fast"}
-        message = f"{pkmn.name} \x0300Lvl\x03:{pkmn.level} \x0300EXP\x03:{pkmn.exp} \x0300HP\x03:{pkmn._hp} \x0300MaxHP\x03:{pkmn.max_hp} \x0300Health\x03:{int(pkmn._hp/pkmn.max_hp*100)}% "
+        message = f"{pkmn.name} \x0300ID\x03:{ID} \x0300Lvl\x03:{pkmn.level} \x0300EXP\x03:{pkmn.exp} \x0300HP\x03:{pkmn._hp} \x0300MaxHP\x03:{pkmn.max_hp} \x0300Health\x03:{int(pkmn._hp/pkmn.max_hp*100)}% "
         message += f"\x0304Att\x03:{pkmn._attack} \x0304Def\x03:{pkmn._defense} \x0304SAtt\x03:{pkmn._sattack} \x0304SDef\x03:{pkmn._sdefense} \x0304Spd\x03:{pkmn._speed} "
         message += f"\x0302h_iv\x03:{pkmn.health_iv} \x0302a_iv\x03:{pkmn.attack_iv} \x0302d_iv\x03:{pkmn.defense_iv} \x0302sa_iv\x03:{pkmn.sattack_iv} \x0302sd_iv\x03:{pkmn.sdefense_iv} \x0302spd_iv\x03:{pkmn.speed_iv} "
         message += f"\x0303h_ev\x03:{pkmn.health_ev} \x0303a_ev\x03:{pkmn.attack_ev} \x0303d_ev\x03:{pkmn.defense_ev} \x0303sa_ev\x03:{pkmn.sattack_ev} \x0303sd_ev\x03:{pkmn.sdefense_ev} \x0303spd_ev\x03:{pkmn.speed_ev} "
