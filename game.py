@@ -426,10 +426,12 @@ class Player(object):
         self.name = name
         self.party = []
         self.stored = []
-        self.recently_swapped = queue.Queue(10)
         #TODO: store in database
-        self.potions = 5
+        self.recently_swapped = queue.Queue(10)
         #TODO recreate player with potions and pokeballs
+        self.potions = 5
+        # TODO: set message preference in database
+        self.message_preference = "notice"
 
     def get_queue_contents(self):
         removed = []
@@ -516,6 +518,10 @@ class Pokemon(object):
         self.special_defense()
         self.speed()
         self.defeated_by = None
+        # 0: don't evolve 1: evolve as normal 2: jolteon 3: flareon 4: vaporeon
+        self.evolve_setting = 1
+        if self.name.capitalize() == "Eevee":
+            self.evolve_setting = 0
 
     def get_stats(self):
         self.stats = pokemon_dict[self.name.capitalize()]
@@ -576,13 +582,17 @@ class Pokemon(object):
         return exp_change
 
     def evolve(self):
-        self.name = self.evolution
+        evolve_dict = {2: "Jolteon", 3: "Vaporeon", 4: "Flareon"}
+        if self.evolve_setting in evolve_dict.keys():
+            self.name = evolve_dict[self.evolve_setting]
+        else:
+            self.name = self.evolution
         self.get_stats()
         self._hp = self.max_hp
         self.times_evolved += 1
 
         
-    def check_level(self):
+    def check_level(self, check_evolve=True):
         if self.growth_rate == 3: # fast
             level = round(((5*self.exp)/4)**(1/3))
         elif self.growth_rate == 2:
@@ -604,7 +614,7 @@ class Pokemon(object):
             self.special_attack()
             self.special_defense()
             self.speed()
-            if self.level >= self.evolution_level and self.evolution != "XXXXXXX":
+            if self.level >= self.evolution_level and self.evolution != "XXXXXXX" and self.evolve_setting != 0 and check_evolve:
                 self.evolve()
             return level
         else:
@@ -660,6 +670,10 @@ class ReconstructedPokemon(Pokemon):
         self.player = trainer
         self.exp = exp
         self._hp = hp
+        #XXX set SQL for evolve setting
+        self.evolve_setting = 1
+        if self.name.capitalize() == "Eevee":
+            self.evolve_setting = 0
         self.health_iv = health_iv
         self.attack_iv = attack_iv
         self.defense_iv = defense_iv
@@ -678,7 +692,7 @@ class ReconstructedPokemon(Pokemon):
         # This is just random.  I'm not going to implement a faithful attack system.
         self.moves = [("attack", 40), ("attack", 80), ("special attack", 40), ("special attack", 80), ("lower defense")]
         self.level = 1
-        self.check_level()
+        self.check_level(check_evolve=False)
         self.get_experience()
         self.hp()
         self.attack()
@@ -760,16 +774,25 @@ class Client(object):
     def send(self, message):
         message += "\r\n"
         to_send_back = bytes(message.encode("utf-8")) 
+        print(to_send_back)
         self.socket.send(to_send_back)
 
     def send_to(self, recipient, message):
+        IRC_cmd = "PRIVMSG"
+        if type(recipient) is str:
+            possible_player = self.get_player(recipient)
+            if possible_player:
+                recipient = possible_player
+                
         if type(recipient) is Player:
+            if recipient.message_preference == "notice":
+                IRC_cmd = "NOTICE"
             recipient = recipient.name
         length = len(message)
         num_messages = int(math.ceil(length/400))
         for n in range(num_messages):
-            submessage = message[n*400:(n+1)*400]
-            self.send(f"PRIVMSG {recipient} :{submessage}")
+            submessage = message[n*400:(n+1)*400] # max length IRC is 512 cf. rfc1459
+            self.send(f"{IRC_cmd} {recipient} :{submessage}")
 
     def handle_ping(self, data):
         self.send(f"PONG {data[1]}")
@@ -833,6 +856,41 @@ class Client(object):
             self.parse_challenge_decline(channel, nick)
         elif player_cmd == "#pokefind":
             self.parse_pokefind(nick, split)
+        elif player_cmd == "#set-evolve":
+            self.parse_set_evolve(nick, split)
+
+    def parse_set_evolve(self, nick, command):
+        eeveelutions = ["Jolteon", "Vaporeon", "Flareon"]
+        if nick not in self.player_list:
+            raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
+        player = self.get_player(nick)
+        if len(command) < 3:
+           raise BadPrivMsgCommand(nick, f"Syntax: #set-evolve <pokemon_label> <setting>. Setting can be Off, On, or if Eevee: Jolteon, Vaporeon, Flareon")
+        _, _, pokemon = self.get_pokemon(command[1], player)
+        #return index, which_container, pokemon
+        setting = command[2]
+        if setting.lower() in ["off", "false", "no"]:
+            pokemon.evolve_setting = 0
+        elif setting.lower() in ["on", "true", "yes"]:
+            if pokemon.name.capitalize() == "Eevee":
+                raise BadPrivMsgCommand(nick, "#set-evolve: the only valid settings for Eevee are Off, 'Jolteon', 'Vaporeon', and 'Flareon'")
+            pokemon.evolve_setting = 1
+        elif setting.capitalize() in eeveelutions:
+            print("is in eeveelutions")
+            if pokemon.name.capitalize() == "Eevee":
+                print("is eevee")
+                pokemon.evolve_setting = eeveelutions.index(setting.capitalize()) + 2
+                print(pokemon.evolve_setting)
+            else:
+                print("is not eevee")
+                raise BadPrivMsgCommand(nick, "#set-evolve: You can only set 'Jolteon', 'Vaporeon' and 'Flareon' for Eevee.")
+        
+        
+        #self.evolve_setting = 1
+
+        
+    #def get_pokemon(self, which_pokemon, player, has_to_be="Neither"):
+            
 
     def parse_pokefind(self, nick, command):
         if nick not in self.player_list:
@@ -1059,7 +1117,7 @@ class Client(object):
         self.send_to(channel, f"{nick} set a repel.  Pokemon won't appear for another half hour.")
 
     def parse_commands(self, nick):
-        self.send_to(nick, "#starter #go #examine #team #pc #swap #repel #release #catch #commands #pokecount #pokedex #challenge #challenge-accept #challenge-decline") #TODO: pokedex
+        self.send_to(nick, "#starter #go #examine #team #pc #swap #repel #release #catch #commands #pokecount #pokedex #challenge #challenge-accept #challenge-decline #pokefind #set-evolve") #TODO: pokedex
 
     def parse_test(self, nick):
         raise BadPrivMsgCommand(nick, "This is a test")
@@ -1156,6 +1214,12 @@ class Client(object):
         index, container, pkmn = self.get_pokemon(command[1].lower(), player)
         ID = pkmn.get_pokemon_identifier()
         exp_to_next_level = pkmn.get_experience(pkmn.level+1) - pkmn.exp
+        ev_setting_dict = {0: "No", 1: "Yes", 2: "into Jolteon", 3: "into Vaporeon", 4: "into Flareon"}
+        will_evolve = ev_setting_dict[pkmn.evolve_setting]
+        print(pkmn.evolve_setting)
+        print(will_evolve)
+        if will_evolve != "No" and not pkmn.evolution != "XXXXXXX":
+            will_evolve = "No"
         if pkmn.level == 100:
             exp_to_next_level = "N/A"
 
@@ -1164,7 +1228,7 @@ class Client(object):
         message += f"\x0304Att\x03:{pkmn._attack} \x0304Def\x03:{pkmn._defense} \x0304SAtt\x03:{pkmn._sattack} \x0304SDef\x03:{pkmn._sdefense} \x0304Spd\x03:{pkmn._speed} "
         message += f"\x0302h_iv\x03:{pkmn.health_iv} \x0302a_iv\x03:{pkmn.attack_iv} \x0302d_iv\x03:{pkmn.defense_iv} \x0302sa_iv\x03:{pkmn.sattack_iv} \x0302sd_iv\x03:{pkmn.sdefense_iv} \x0302spd_iv\x03:{pkmn.speed_iv} "
         message += f"\x0303h_ev\x03:{pkmn.health_ev} \x0303a_ev\x03:{pkmn.attack_ev} \x0303d_ev\x03:{pkmn.defense_ev} \x0303sa_ev\x03:{pkmn.sattack_ev} \x0303sd_ev\x03:{pkmn.sdefense_ev} \x0303spd_ev\x03:{pkmn.speed_ev} "
-        message += f"\x0308GrowthRate\x03:{growth_dict[pkmn.growth_rate]} \x0308ExpToNextLevel\x03:{exp_to_next_level}\x03"
+        message += f"\x0308GrowthRate\x03:{growth_dict[pkmn.growth_rate]} \x0308ExpToNextLevel\x03:{exp_to_next_level}\x03 \x0308Will_evolve\x03:{will_evolve}"
         self.send_to(nick, message)
 
     def heal_pokemon(self, pokemon):
