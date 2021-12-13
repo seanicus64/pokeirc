@@ -11,6 +11,24 @@ import configparser
 import argparse
 import queue
 from datetime import datetime
+W =     WHITE =     "\x0300"
+K =     BLACK =     "\x0301"
+B =     BLUE =      "\x0302"
+G =     GREEN =     "\x0303"
+R =     RED =       "\x0304"
+BR =    BROWN =     "\x0305"
+P =     PURPLE =    "\x0306"
+O =     ORANGE =    "\x0307"
+Y =     YELLOW =    "\x0308"
+LG =    L_GREEN =   "\x0309"
+C =     CYAN =      "\x0310"
+LC =    L_CYAN =    "\x0311"
+LB =    L_BLUE =    "\x0312"
+PK =    PINK =      "\x0313"
+GY =    GRAY =      "\x0314"
+LGY =   L_GRAY =    "\x0315"
+X =     CLEAR =     "\x03" # XXX non printing character or something here?
+
 type_dict = {
     #           2X effective                                1/2 effective                                               0 effective
     "water":    (["ground", "rock", "fire"],                ["water", "grass"],                                         []),
@@ -204,7 +222,7 @@ pokemon_dict = {
     "Marowak":          (105,     "ground",     1,1,124,        (60, 80, 110, 50, 80, 45),  ("XXXXXXX",     0),      28),
     "Hitmonlee":        (106,     "fighting",   2,1,139,        (50, 120, 53, 35, 110, 87),  ("XXXXXXX",     0),     25),
     "Hitmonchan":       (107,     "fighting",   2,1,140,        (50, 105, 79, 35, 110, 76),  ("XXXXXXX",     0),     25),
-    "Licktung":         (108,     "normal",     2,1,127,        (90, 55, 75, 60, 75, 30),  ("XXXXXXX",     0),       20),
+    "Lickitung":         (108,     "normal",     2,1,127,        (90, 55, 75, 60, 75, 30),  ("XXXXXXX",     0),       20),
     "Koffing":          (109,     "poison",     1,1,114,        (40, 65, 95, 60, 45, 35),  ("Weezing",     35),      20),
     "Weezing":          (110,     "poison",     1,1,173,        (65, 90, 120, 85, 70, 60),  ("XXXXXXX",     0),      35),
     "Rhyhorn":          (111,     "rock",       1,3,135,        (80, 85, 95, 30, 30, 25),  ("Rhydon",     42),       23),
@@ -431,7 +449,7 @@ class Player(object):
         #TODO recreate player with potions and pokeballs
         self.potions = 5
         # TODO: set message preference in database
-        self.message_preference = "notice"
+        self.message_preference = "privmsg"
 
     def get_queue_contents(self):
         removed = []
@@ -663,7 +681,7 @@ class Pokemon(object):
 
 
 class ReconstructedPokemon(Pokemon):
-    def __init__(self, index, species, trainer, container_label, exp, hp, health_iv, attack_iv, defense_iv, sattack_iv, sdefense_iv, speed_iv, health_ev, attack_ev, defense_ev, sattack_ev, sdefense_ev, speed_ev, times_evolved):
+    def __init__(self, index, species, trainer, container_label, exp, hp, health_iv, attack_iv, defense_iv, sattack_iv, sdefense_iv, speed_iv, health_ev, attack_ev, defense_ev, sattack_ev, sdefense_ev, speed_ev, times_evolved, evolve_setting):
         self.container_label = container_label
         self.index = index
         self.name = species
@@ -671,9 +689,9 @@ class ReconstructedPokemon(Pokemon):
         self.exp = exp
         self._hp = hp
         #XXX set SQL for evolve setting
-        self.evolve_setting = 1
-        if self.name.capitalize() == "Eevee":
-            self.evolve_setting = 0
+        self.evolve_setting = evolve_setting
+#        if self.name.capitalize() == "Eevee":
+#            self.evolve_setting = 0
         self.health_iv = health_iv
         self.attack_iv = attack_iv
         self.defense_iv = defense_iv
@@ -851,7 +869,7 @@ class Client(object):
         elif player_cmd == "#challenge":
             self.parse_challenge(channel, nick, split)
         elif player_cmd == "#challenge-accept":
-            self.parse_challenge_accept(channel, nick)
+            self.parse_challenge_accept(channel, nick, split)
         elif player_cmd == "#challenge-decline":
             self.parse_challenge_decline(channel, nick)
         elif player_cmd == "#pokefind":
@@ -887,11 +905,16 @@ class Client(object):
         
         
         #self.evolve_setting = 1
+        self.sql_change_evolve_setting(pokemon.index, pokemon.evolve_setting)
 
         
     #def get_pokemon(self, which_pokemon, player, has_to_be="Neither"):
             
-
+    def sql_change_evolve_setting(self, pokemon_index, setting):
+        self.cur.execute("""UPDATE pokemon SET evolve_setting = ? WHERE pokemon_id =?""", (setting, pokemon_index))
+        self.con.commit()
+        
+        #self.cur.execute("""UPDATE pokemon SET container_label = ? WHERE pokemon_id = ?""", (container_label, pokemon_id))
     def parse_pokefind(self, nick, command):
         if nick not in self.player_list:
             raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
@@ -919,7 +942,7 @@ class Client(object):
             
             
 
-    def parse_challenge_accept(self, channel, nick):
+    def parse_challenge_accept(self, channel, nick, split):
         if nick not in self.player_list:
             raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
         player2 = self.get_player(nick)
@@ -927,10 +950,15 @@ class Client(object):
             raise BadPrivMsgCommand(nick, f"You weren't challenged to a trainer battle in {channel.name}!")
         if channel.challenge["phase"] != "prebattle":
             raise BadPrivMsgCommand(nick, "The challenge has already been accepted!")
+        challenged_party = self.get_challenge_party(player2, split)
+        challenge_party = player2.party #TODO: select a subset
+        average = int(sum([p.level for p in challenge_party])/len(challenge_party))
+
+        channel.challenge["challenged_party"] = challenged_party
         channel.challenge["phase"] = "first_turn"
         channel.challenge["timeout"] = int(time.time()) + 60
         player1 = channel.challenge["challenger"]
-        self.send_to(channel.name, f"{nick} has accepted the challenge. {player1.name} has 60 seconds to send out the first pokemon")
+        self.send_to(channel.name, f"{BLUE}{nick}{CLEAR} has accepted the challenge with a team of {GREEN}{len(challenge_party)}{CLEAR} (average level: {GREEN}{average}{CLEAR}). {RED}{player1.name}{CLEAR} has {GREEN}60{CLEAR} seconds to send out the first pokemon with {GRAY}#go{CLEAR}.")
 
     def parse_challenge_decline(self, channel, nick):
         if nick not in self.player_list:
@@ -942,9 +970,21 @@ class Client(object):
         if channel.challenge["phase"] != "prebattle":
             raise BadPrivMsgCommand(nick, "The challenge has already been accepted!")
 
+        self.send_to(channel.name, f"{BLUE}{nick}{CLEAR} has rejected {RED}{channel.challenge['challenger'].name}{CLEAR}'s challenge.") 
+        # TODO: change colors according to whether it's the challenger or challenged declining
         channel.challenge = None
-        self.send_to(channel.name, f"{nick} has rejected {channel.challenge['challenger']}'s challenge.")
         
+    def get_challenge_party(self, player, split):
+        challenge_party = set()
+        if len(split) > 2:
+            for arg in split[2:]:
+                _, _, pokemon = self.get_pokemon(arg, player, "party")
+                if pokemon._hp > 0:
+                    challenge_party.add(pokemon)
+                    print(f"{pokemon} added")
+        if not challenge_party:
+            challenge_party = player.party
+        return challenge_party
 
     def parse_challenge(self, channel, nick, split):
         if len(split) < 2:
@@ -959,10 +999,16 @@ class Client(object):
         if channel.challenge:
             raise BadChanCommand(channel.name, f"There is already a battle challenge in this channel")
         player2 = self.get_player(nick2)
-        timeout = 180
-        channel.challenge = {"challenger": player, "challenged": player2, "pokemon1": None, "pokemon2": None, "timeout": int(time.time()) + timeout, "phase": "prebattle"}
+        challenger_party = self.get_challenge_party(player, split)
+        
+        print(challenger_party)
+        #first_idx, first_container, first_pokemon = self.get_pokemon(first_pokemon, player, first_has_to_be)
 
-        self.send_to(channel.name, f"{nick} has challenged {nick2} to a battle! {nick2} has {timeout} seconds to #challenge-accept or #challenge-decline.")
+        timeout = 180
+        channel.challenge = {"challenger": player, "challenged": player2, "pokemon1": None, "pokemon2": None, "timeout": int(time.time()) + timeout, "phase": "prebattle", "challenger_party": challenger_party}
+        challenge_party = player.party #TODO: select a subset
+        average = int(sum([p.level for p in challenge_party])/len(challenge_party))
+        self.send_to(channel.name, f"{RED}{nick}{CLEAR} challenges {BLUE}{nick2}{CLEAR} to a battle with a team of {GREEN}{len(challenge_party)}{CLEAR} (average level: {GREEN}{average}{GREEN}{CLEAR}). {BLUE}{nick2}{CLEAR} has {GREEN}{timeout}{CLEAR} seconds to {GRAY}#challenge-accept{CLEAR} or {GRAY}#challenge-decline{CLEAR}.")
 
         
     
@@ -1019,16 +1065,16 @@ class Client(object):
         amount = len(ever_owned)
         return ever_owned
     def parse_pokecount(self, nick):
-        abbreviations = "BLB IVY VNS CHM CHE CHZ SQU WAR BLA CAT MPD BFR WDL KAK " 
-        abbreviations += "BDR PGY PGO PGT RTA RTC SPW FRW EKS ARB PIK RAI SRW SSL "
-        abbreviations += "NDM NDO NDK NDF NDA NDQ CLF CFB VPX NTS JPF WTF ZUB GOL ODD "
-        abbreviations += "GLM VLP PRS PST VNT VMT DLT DTR MTH PRS PSD GLD MKY PRI GRW "
-        abbreviations += "ARC PWG PWL PWT ABR KDB ALA MCH MCK MCP BSP WPB VTB TCL TCR "
-        abbreviations += "GEO GRV GLM PNY RPD SLP SLB MGN MGT FFD DDU DDR SEL DWG GRM "
-        abbreviations += "MUK SHL CLY GAS HNT GEN ONX DRZ HYP KRB KNG VLT ELE EXC EXT "
-        abbreviations += "CUB MWK HML HMC LIK KOF WEZ RHH RHD CHS TNG KGK HRS SEA GLD "
-        abbreviations += "SKG SYU SME MIM SCY JYX EBZ MAG PNS TRS MKP GRD LAP DIT EVE "
-        abbreviations += "VPR JLT FLR PRG OMY OMS KAB KAT AER SLX ART ZAP MOL DTI DNR DNT MWT MEW"
+        abbreviations =  "BLB IVY VNS CHM CHE CHZ SQU WAR BLA CAT MPD BFR WDL KAK BDR " 
+        abbreviations += "PGY PGO PGT RTA RTC SPW FRW EKS ARB PIK RAI SRW SSL NDM NDO "
+        abbreviations += "NDK NDF NDA NDQ CLF CFB VPX NTS JPF WTF ZUB GOL ODD GLM VLP "
+        abbreviations += "PRS PST VNT VMT DLT DTR MTH PRS PSD GLD MKY PRI GRW ARC PWG "
+        abbreviations += "PWL PWT ABR KDB ALA MCH MCK MCP BSP WPB VTB TCL TCR GEO GRV "
+        abbreviations += "GLM PNY RPD SLP SLB MGN MGT FFD DDU DDR SEL DWG GRM MUK SHL "
+        abbreviations += "CLY GAS HNT GEN ONX DRZ HYP KRB KNG VLT ELE EXC EXT CUB MWK "
+        abbreviations += "HML HMC LIK KOF WEZ RHH RHD CHS TNG KGK HRS SEA GLD SKG SYU "
+        abbreviations += "SME MIM SCY JYX EBZ MAG PNS TRS MKP GRD LAP DIT EVE VPR JLT "
+        abbreviations += "FLR PRG OMY OMS KAB KAT AER SLX ART ZAP MOL DTI DNR DNT MWT MEW"
         abbreviations = abbreviations.split()
 
         if nick not in self.player_list:
@@ -1409,7 +1455,6 @@ class Client(object):
                     losing_trainer = channel.challenge["challenger"]
                     winning_trainer = channel.challenge["challenged"]
                     channel.challenge["pokemon1"] = None
-
                 else:
                     losing_trainer = channel.challenge["challenged"]
                     winning_trainer = channel.challenge["challenger"]
@@ -1465,6 +1510,17 @@ class Client(object):
             channel.fainted_pokemon = loser
             loser.defeated_by = winning_trainer
         else:
+            challenger = channel.challenge["challenger"]
+            challenger_alive = list(filter(lambda pkmn: pkmn._hp > 0, challenger.party))
+            challenger_dead = list(filter(lambda pkmn: pkmn._hp <= 0, challenger.party))
+            challenger_string = f"{RED}{challenger.name}{CLEAR}: [{GREEN}{'o' * len(challenger_alive)}{RED}{'#' * len(challenger_dead)}{CLEAR}]"
+
+            challenged = channel.challenge["challenged"]
+            challenged_alive = list(filter(lambda pkmn: pkmn._hp > 0, challenged.party))
+            challenged_dead = list(filter(lambda pkmn: pkmn._hp <= 0, challenged.party))
+            challenged_string = f"{BLUE}{challenged.name}{CLEAR}: [{GREEN}{'o' * len(challenged_alive)}{RED}{'#' * len(challenged_dead)}{CLEAR}]"
+
+            message = challenger_string + " " + challenged_string + message
             self.sql_update_health(loser)
         self.sql_update_health(winner)
         return message
@@ -1511,7 +1567,8 @@ class Client(object):
         sdefense_ev = pokemon.sdefense_ev
         speed_ev = pokemon.speed_ev
         times_evolved = pokemon.times_evolved
-        self.cur.execute("""INSERT INTO pokemon (species, trainer, container_label, experience, hp, health_iv, attack_iv, defense_iv, sattack_iv, sdefense_iv, speed_iv, health_ev, attack_ev, defense_ev, sattack_ev, sdefense_ev, speed_ev, times_evolved) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (species, trainer, container_label, experience, hp, health_iv, attack_iv, defense_iv, sattack_iv, sdefense_iv, speed_iv, health_ev, attack_ev, defense_ev, sattack_ev, sdefense_ev, speed_ev, times_evolved))
+        evolve_setting = pokemon.evolve_setting
+        self.cur.execute("""INSERT INTO pokemon (species, trainer, container_label, experience, hp, health_iv, attack_iv, defense_iv, sattack_iv, sdefense_iv, speed_iv, health_ev, attack_ev, defense_ev, sattack_ev, sdefense_ev, speed_ev, times_evolved, evolve_setting) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (species, trainer, container_label, experience, hp, health_iv, attack_iv, defense_iv, sattack_iv, sdefense_iv, speed_iv, health_ev, attack_ev, defense_ev, sattack_ev, sdefense_ev, speed_ev, times_evolved, evolve_setting))
         self.con.commit()
         self.cur.execute("""SELECT pokemon_id FROM pokemon ORDER BY pokemon_id DESC LIMIT 1;""")
         results = self.cur.fetchall()
@@ -1675,7 +1732,7 @@ class Client(object):
                             self.send_to(c.name, f"{c.challenge['challenged'].name} didn't respond in time, and the challenge expired")
                             c.challenge = None
                         elif c.challenge["phase"] == "first_turn":
-                            self.send_to(c.name, f"{c.challenge['challenger'].name} didn't respond in time, and has forfeited the match. aaaaaaaaa")
+                            self.send_to(c.name, f"{c.challenge['challenger'].name} didn't respond in time, and has forfeited the match.")
                             c.challenge = None
                         elif c.challenge["phase"] == "battle":
                             loser = c.challenge["challenged"]
@@ -1706,7 +1763,7 @@ class Client(object):
         self.con.execute("PRAGMA foreign_keys = 1")
         self.cur = self.con.cursor()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS trainers (trainer_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, nick TEXT NOT NULL UNIQUE)""")
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS pokemon (pokemon_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, species TEXT NOT NULL, trainer INTEGER, container_label TEXT,  experience INTEGER, hp INTEGER, health_iv INTEGER, attack_iv INTEGER, defense_iv INTEGER, sattack_iv INTEGER, sdefense_iv INTEGER, speed_iv INTEGER, health_ev INTEGER, attack_ev INTEGER, defense_ev INTEGER, sattack_ev INTEGER, sdefense_ev INTEGER, speed_ev INTEGER, times_evolved INTEGER DEFAULT 0, FOREIGN KEY (trainer) REFERENCES trainers(trainer_id))""")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS pokemon (pokemon_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, species TEXT NOT NULL, trainer INTEGER, container_label TEXT,  experience INTEGER, hp INTEGER, health_iv INTEGER, attack_iv INTEGER, defense_iv INTEGER, sattack_iv INTEGER, sdefense_iv INTEGER, speed_iv INTEGER, health_ev INTEGER, attack_ev INTEGER, defense_ev INTEGER, sattack_ev INTEGER, sdefense_ev INTEGER, speed_ev INTEGER, times_evolved INTEGER DEFAULT 0, evolve_setting INTEGER DEFAULT 1, FOREIGN KEY (trainer) REFERENCES trainers(trainer_id))""")
         self.con.commit()
 
     def sql_add_trainer(self, nick):

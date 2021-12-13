@@ -1,3 +1,7 @@
+#ALTER TABLE pokemon ADD COLUMN evolve_setting INT;
+#UPDATE  pokemon SET evolve_setting = 0 WHERE species = "Eevee";
+#s
+#s
 #ALTER TABLE pokemon ADD COLUMN times_evolved INTEGER DEFAULT 0;
 #
 #challenge joe
