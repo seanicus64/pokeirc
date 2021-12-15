@@ -951,25 +951,24 @@ class Client(object):
         if channel.challenge["phase"] != "prebattle":
             raise BadPrivMsgCommand(nick, "The challenge has already been accepted!")
         challenged_party = self.get_challenge_party(player2, split)
-        challenge_party = player2.party #TODO: select a subset
-        average = int(sum([p.level for p in challenge_party])/len(challenge_party))
+        #challenge_party = player2.party #TODO: select a subset
+        average = int(sum([p.level for p in challenged_party])/len(challenged_party))
 
         channel.challenge["challenged_party"] = challenged_party
         channel.challenge["phase"] = "first_turn"
         channel.challenge["timeout"] = int(time.time()) + 60
         player1 = channel.challenge["challenger"]
-        self.send_to(channel.name, f"{BLUE}{nick}{CLEAR} has accepted the challenge with a team of {GREEN}{len(challenge_party)}{CLEAR} (average level: {GREEN}{average}{CLEAR}). {RED}{player1.name}{CLEAR} has {GREEN}60{CLEAR} seconds to send out the first pokemon with {GRAY}#go{CLEAR}.")
+        print(challenged_party)
+        self.send_to(channel.name, f"{BLUE}{nick}{CLEAR} has accepted the challenge with a team of {GREEN}{len(challenged_party)}{CLEAR} (average level: {GREEN}{average}{CLEAR}). {RED}{player1.name}{CLEAR} has {GREEN}60{CLEAR} seconds to send out the first pokemon with {GRAY}#go{CLEAR}.")
 
     def parse_challenge_decline(self, channel, nick):
         if nick not in self.player_list:
             raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
         player2 = self.get_player(nick)
-        challenger = channel.challenge["challenged"]
+        challenger = channel.challenge["challenger"]
         challenged = channel.challenge["challenged"]
         
         if not channel.challenge or player2 not in [challenger, challenged]:
-
-        #if not channel.challenge or player2 != channel.challenge["challenged"]:
             raise BadPrivMsgCommand(nick, f"You weren't challenged to a trainer battle in {channel.name}!")
 
         if channel.challenge["phase"] != "prebattle" and player2 == challenged:
@@ -977,11 +976,10 @@ class Client(object):
         if channel.challenge["phase"] == "first_turn" and player2 == challenger:
             message = f"{RED}{challenger.name}{CLEAR} has rejected {BLUE}{challenged.name}{CLEAR}'s counter-challenge."
         else: 
-            message = f"{BLUE}{nick}{CLEAR} has rejected {RED}{challenger.name}{CLEAR}'s challenge.") 
+            message = f"{BLUE}{nick}{CLEAR} has rejected {RED}{challenger.name}{CLEAR}'s challenge." 
     
         self.send_to(channel.name, message)
         #self.send_to(channel.name, f"{BLUE}{nick}{CLEAR} has rejected {RED}{channel.challenge['challenger'].name}{CLEAR}'s challenge.") 
-        # TODO: change colors according to whether it's the challenger or challenged declining
         channel.challenge = None
         
     def get_challenge_party(self, player, split):
@@ -1002,13 +1000,14 @@ class Client(object):
         if nick not in self.player_list:
             raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
         player = self.get_player(nick)
-        # #challenge paine
         nick2 = split[1]
         if nick2 not in self.player_list:
             raise BadChanCommand(channel.name, f"{nick2} is not a valid player")
         if channel.challenge:
             raise BadChanCommand(channel.name, f"There is already a battle challenge in this channel")
         player2 = self.get_player(nick2)
+        if player == player2:
+            raise BadChanCommand(channel.name, f"You can't challenge yourself!")
         challenger_party = self.get_challenge_party(player, split)
         
         print(challenger_party)
@@ -1016,9 +1015,9 @@ class Client(object):
 
         timeout = 180
         channel.challenge = {"challenger": player, "challenged": player2, "pokemon1": None, "pokemon2": None, "timeout": int(time.time()) + timeout, "phase": "prebattle", "challenger_party": challenger_party}
-        challenge_party = player.party #TODO: select a subset
-        average = int(sum([p.level for p in challenge_party])/len(challenge_party))
-        self.send_to(channel.name, f"{RED}{nick}{CLEAR} challenges {BLUE}{nick2}{CLEAR} to a battle with a team of {GREEN}{len(challenge_party)}{CLEAR} (average level: {GREEN}{average}{GREEN}{CLEAR}). {BLUE}{nick2}{CLEAR} has {GREEN}{timeout}{CLEAR} seconds to {GRAY}#challenge-accept{CLEAR} or {GRAY}#challenge-decline{CLEAR}.")
+        #challenge_party = player.party #TODO: select a subset
+        average = int(sum([p.level for p in challenger_party])/len(challenger_party))
+        self.send_to(channel.name, f"{RED}{nick}{CLEAR} challenges {BLUE}{nick2}{CLEAR} to a battle with a team of {GREEN}{len(challenger_party)}{CLEAR} (average level: {GREEN}{average}{GREEN}{CLEAR}). {BLUE}{nick2}{CLEAR} has {GREEN}{timeout}{CLEAR} seconds to {GRAY}#challenge-accept{CLEAR} or {GRAY}#challenge-decline{CLEAR}.")
 
         
     
@@ -1392,7 +1391,7 @@ class Client(object):
         if which_pokemon.upper() in "ABCDEF":
             if has_to_be == "PC":
                 raise BadPrivMsgCommand(nick, f"PC pokemon are referred to by numerical numbers [0-...]")
-            elif has_to_be == "party_no_label":
+            elif has_to_be in ("party_no_label", "challenge_team_no_label"):
                 raise BadPrivMsgCommand(nick, f"Can't refer to pokemon by label. Use full name instead.")
             which_pokemon = "ABCDEF".index(which_pokemon.upper())
             which_container = player.party
@@ -1406,7 +1405,7 @@ class Client(object):
         elif which_pokemon.isdigit():
             if has_to_be == "party":
                 raise BadPrivMsgCommand(nick, f"Party pokemon are referred to by letters [A-Z]")
-            if has_to_be == "party_no_label":
+            if has_to_be in  ("party_no_label", "challenge_team_no_label"):
                 raise BadPrivMsgCommand(nick, f"Can't refer to pokemon by label.  Use full name instead.")
             which_container = player.stored
             which_pokemon = int(which_pokemon)
@@ -1418,6 +1417,19 @@ class Client(object):
         else:
             if has_to_be == "PC":
                 which_container = player.stored
+            # the subset of a team for a trainer battle
+            elif has_to_be == "challenge_team_no_label":
+                for c in self.channels:
+                    challenge = c.challenge
+                    if not challenge:
+                        raise BadPrivMsgCommand("ctnl: This text shouldn't show.  Tell sean if it does.")
+                    challenger, challenged = challenge["challenger"], challenge["challenged"]
+                    if nick == challenger.name:
+                        which_container = challenge["challenger_party"]
+                    elif nick == challenged.name:
+                        which_container = challenge["challenged_party"]
+
+
             else:
                 which_container = player.party
             index = 0
@@ -1450,6 +1462,7 @@ class Client(object):
             raise BadChanCommand(channel.name, f"{pokemon} has fainted and can't fight!")
 
         if channel.challenge and player in contestants:
+            index, container, pokemon = self.get_pokemon(which_pokemon, player, has_to_be="challenge_team_no_label")
             if contestants.index(player) == 0:
                 channel.challenge["pokemon1"] = pokemon
                 if channel.challenge["phase"] == "first_turn":

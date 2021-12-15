@@ -1,4 +1,62 @@
-make it so that you can set whehter PMs or notices
+
+
+#pcsort alpha
+    A: 0 D: 20 M: 38 S: 60 ?: 77
+#pcsort type
+    electric: 0, fire: 8 flying: 14 dragon: 22 ground: XX grass: XX water: XX rock: XX normal: XX psychic: XX ghost: XX, dragon: XX ice: XX bug: XX fighting: XX poison:XX ?: XX
+#pcsort level
+    0: 0 10: 3 20: 30 30: 40 40: 66 50: 32 60: 434 ?: XX
+#pcsort
+    just by itself shows the current sort
+? is the unsorted newly captured mon
+#release LAST
+#groups
+#group main 40 43 20 56 23 22
+#group-switch main
+#autosort
+
+#lure 
+    a pokemon in your level range pops up that moment
+    only five of these a day
+#bait?  #travelto  #vote-location
+    attract a certain type of pokemon to come
+#travel cave
+    this command also attracts certain trainers
+    beach
+    garden
+    volcano
+    powerplant
+    pit?
+    cave
+    cliffs
+    city
+    temple
+    cemetary
+    lair
+    glacier
+    basement
+    ring
+    dump
+
+
+
+make it so that you can set whter PMve                                1/2 effective                                               0 effective
+14     "water":    (["ground", "rock", "fire"],                ["water", "grass"],                                         []),
+13     "grass":    (["ground", "rock", "water"],               ["flying", "poison", "bug", "fire", "grass", "dragon"],     []),
+12     "fire":     (["bug", "grass", "ice"],                   ["rock", "fire", "water", "dragon"],                        []),
+11     "electric": (["flying", "water"],                       ["grass", "electric", "dragon"],                            ["ground"]),
+10     "ground":   (["poison", "rock", "fire", "electric"],    ["bug", "grass"],                                           ["flying"]),
+9     "rock":     (["fire", "bug", "flying", "ice"],          ["fighting", "ground"],                                     []),
+8     "flying":   (["fighting", "bug", "grass"],              ["rock", "electric"],                                       []),
+7     "normal":   ([],                                        ["rock"],                                                   ["ghost"]),
+6     "psychic":  (["fighting", "poison"],                    ["psychic"],                                                []),
+5     "ghost":    (["ghost", "psychic"],                      [],                                                         ["normal"]),
+4     "dragon":   (["dragon"],                                [],                                                         []),
+3     "ice":      (["flying", "ground", "grass", "dragon"],   ["water", "ice", "fire"],                                   []),
+2     "bug":      (["grass", "psychic"],                      ["poison", "fighting", "flying", "ghost", "fire"],          []),
+1     "fighting": (["normal", "rock", "ice"],                 ["flying", "poison", "bug", "psychic"],                     ["ghost"]),
+48       "poison":   (["grass"],                                 ["poison", "ground", "rock", "bug"],                        []),
+1 }ices
 "Pick on someone your own size"
 limit pokeballs
 limit heals
