@@ -40,7 +40,7 @@ type_dict = {
     "flying":   (["fighting", "bug", "grass"],              ["rock", "electric"],                                       []),
     "normal":   ([],                                        ["rock"],                                                   ["ghost"]),
     "psychic":  (["fighting", "poison"],                    ["psychic"],                                                []),
-    "ghost":    (["ghost", "psychic"],                      [],                                                         ["normal", "psychic"]),
+    "ghost":    (["ghost", "psychic"],                      [],                                                         ["normal"]),
     "dragon":   (["dragon"],                                [],                                                         []),
     "ice":      (["flying", "ground", "grass", "dragon"],   ["water", "ice", "fire"],                                   []),
     "bug":      (["grass", "psychic"],                      ["poison", "fighting", "flying", "ghost", "fire"],          []),
@@ -964,13 +964,23 @@ class Client(object):
         if nick not in self.player_list:
             raise BadPrivMsgCommand(nick, f"{nick}: You have to choose a starter pokemon first with the command #starter <pokemon>")
         player2 = self.get_player(nick)
+        challenger = channel.challenge["challenged"]
+        challenged = channel.challenge["challenged"]
+        
+        if not channel.challenge or player2 not in [challenger, challenged]:
 
-        if not channel.challenge or player2 != channel.challenge["challenged"]:
+        #if not channel.challenge or player2 != channel.challenge["challenged"]:
             raise BadPrivMsgCommand(nick, f"You weren't challenged to a trainer battle in {channel.name}!")
-        if channel.challenge["phase"] != "prebattle":
-            raise BadPrivMsgCommand(nick, "The challenge has already been accepted!")
 
-        self.send_to(channel.name, f"{BLUE}{nick}{CLEAR} has rejected {RED}{channel.challenge['challenger'].name}{CLEAR}'s challenge.") 
+        if channel.challenge["phase"] != "prebattle" and player2 == challenged:
+            raise BadPrivMsgCommand(nick, "The challenge has already been accepted!")
+        if channel.challenge["phase"] == "first_turn" and player2 == challenger:
+            message = f"{RED}{challenger.name}{CLEAR} has rejected {BLUE}{challenged.name}{CLEAR}'s counter-challenge."
+        else: 
+            message = f"{BLUE}{nick}{CLEAR} has rejected {RED}{challenger.name}{CLEAR}'s challenge.") 
+    
+        self.send_to(channel.name, message)
+        #self.send_to(channel.name, f"{BLUE}{nick}{CLEAR} has rejected {RED}{channel.challenge['challenger'].name}{CLEAR}'s challenge.") 
         # TODO: change colors according to whether it's the challenger or challenged declining
         channel.challenge = None
         
