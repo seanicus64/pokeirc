@@ -1456,6 +1456,8 @@ class Client(object):
             if not channel.wild_pokemon:
                 raise BadChanCommand(channel.name, "There is no pokemon there!")
 
+        if len(command) < 2:
+            raise BadChanCommand(channel.name, f"Syntax: #go <pokemon>")
         which_pokemon = command[1].lower()
         index, container, pokemon = self.get_pokemon(which_pokemon, player, has_to_be="party_no_label")
         if pokemon._hp <= 0:
@@ -1775,6 +1777,8 @@ class Client(object):
 
                 #if it's time for the pokemon to wander off
                 if self.current_time >= c.wild_pokemon_time and c.wild_pokemon:# and c.current_privmsg > 0:
+                    pokemon_type = c.wild_pokemon.type
+
                     self.send_to(c.name, f"The wild {c.wild_pokemon} wandered off.")
                     del c.wild_pokemon
                     c.wild_pokemon = None
