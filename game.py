@@ -677,7 +677,7 @@ class Pokemon(object):
             hp_color = "\x0304"
 #        color_dict = {"electric": "08", "fire": "04", "water": "02", "grass": "09", "ground": "05", "rock": "14", 
 #            "flying": "11", "normal": "00", "psychic": "13", "ghost": "06", "dragon": "12", "ice": "10", "bug": "15", "fighting": "03", "poison": "07"}
-        return f"\x03{type_color_dict[self.type]}{self.name}\x03-\x03{hp_color}{self.level}\x03"
+        return f"\x03{type_color_dict[self.type]}{self.name}\x03-{hp_color}{self.level}\x03"
 
 
 class ReconstructedPokemon(Pokemon):
