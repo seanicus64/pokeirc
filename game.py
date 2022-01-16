@@ -101,17 +101,10 @@ starters = (
     "squirtle",
     "charmander",
     "pikachu",
-    "caterpie",
-    "pidgey",
-    "meowth",
-    "nidoran_m",
-    "nidoran_f",
     "abra",
     "gastly",
     "machop",
     "geodude",
-    "dratini",
-    "cubone",
     )
 
 # in order:
@@ -355,8 +348,11 @@ class Channel(object):
         """Set up an IRC channel with defaults"""
         self.game = game
         encounter_type = encounter_info[0]
+        self.repel_perms = "ops_only"
+        self.repelling = False
         self.encounter_type = encounter_type
         self.challenge = None
+        self.ops = set()
 
         if encounter_type == "time":
             self.min_time = encounter_info[1]
@@ -818,6 +814,7 @@ class Client(object):
         for name in sections[1:]:
             section = config[name]
             encounter_type = config[name]["encounter_type"]
+            repel_perms = config[name]["repel_perms"]
             # TIME-based encounter channel.  
             if encounter_type == "time":
                 min_time = int(config[name].get("min_time"))
@@ -834,6 +831,7 @@ class Client(object):
 
             else:
                 raise Exception("encounter_type not set to 'time' or 'message'")
+            channel.repel_perms = repel_perms
         
     def reconstruct_pokemon(self, player):
         """Reconstructs all the pokemon a player has from the SQL database."""
@@ -935,6 +933,8 @@ class Client(object):
             self.parse_swap(nick, split)
         elif player_cmd == "#repel" and channel:
             self.parse_repel(channel.name, nick)
+        elif player_cmd == "#unrepel" and channel:
+            self.parse_unrepel(channel, nick)
         elif player_cmd == "#commands":
             self.parse_commands(nick)
         elif player_cmd == "#release":
@@ -1116,7 +1116,6 @@ class Client(object):
         """Returns how many pokemon species a player has owned."""
         self.cur.execute("SELECT * FROM pokemon WHERE trainer = ?", (player.index,))
         results = self.cur.fetchall()
-        print(results)
         ever_owned = set()
         for i in results:
             name = i[1].lower().capitalize()
@@ -1124,16 +1123,22 @@ class Client(object):
             prevs = []
             known_about = [name]
             while times_evolved > 0:
-                for k in list(reversed(pokemon_dict.keys())):
-                    possible_preevolve = k
-                    data = pokemon_dict[k]
-                    evolution = data[6]
-                    if evolution[0].lower().capitalize() in known_about:
-                        known_about.append(possible_preevolve.lower().capitalize())
-                        
-                        prevs.append(possible_preevolve)
-                        ever_owned.add(possible_preevolve)
-                        times_evolved -= 1
+                if name in ["Jolteon", "Flareon", "Jolteon"]:
+                    known_about.append("Eevee")
+                    prevs.append("Eevee")
+                    break
+                else:
+                    for k in list(reversed(pokemon_dict.keys())):
+                            
+                        possible_preevolve = k
+                        data = pokemon_dict[k]
+                        evolution = data[6]
+                        if evolution[0].lower().capitalize() in known_about:
+                            known_about.append(possible_preevolve.lower().capitalize())
+                            
+                            prevs.append(possible_preevolve)
+                            ever_owned.add(possible_preevolve)
+                            times_evolved -= 1
 
             ever_owned.add(name)
         amount = len(ever_owned)
@@ -1231,17 +1236,64 @@ class Client(object):
             del pokemon
             
          
+    def get_channel(self, name):
+        """Gets a channel from a name"""
+        for c in self.channels:
+            if c.name == name:
+                return c
+        return None
+
+
+    def parse_unrepel(self, channel, nick):
+        """PArses an #unrepeal command so pokemon can show up again"""
+        if channel.repel_perms == "anyone":
+            now_repelling = False
+        if channel.repel_perms == "ops_only":
+            if channel.repelling:
+                if nick in channel.ops:
+                    now_repelling = False
+                else:
+                    raise BadChanCommand(channel, f"Only Ops can set or unset repels")
+        if not now_repelling:
+            channel.repelling = False
+            self.send_to(channel, "Repel has worn off.")
+            channel.reset_next_wild()
 
     def parse_repel(self, channel, nick):
         """Parses a REPEL command so pokemon will no logner show up."""
         # This command is not currently used.
         # TODO: make this dependent on whether player is an OP or not
-        self.repelling = True
-        self.send_to(channel, f"{nick} set a repel.  Pokemon won't appear for another half hour.")
+        now_repelling = False
+        channel = self.get_channel(channel)
+        if not channel: return
+
+        if channel.repel_perms == "anyone":
+            now_repelling = True
+        if channel.repel_perms == "ops_only":
+            if nick in channel.ops:
+                now_repelling = True
+            else:
+                raise BadChanCommand(channel, f"Only Ops can set or unset repels")
+        if now_repelling:
+            channel.wild_pokemon = None
+            channel.repelling = True
+            time_span = 60 * 60 * 2 # two hours
+            channel.repel_end_time = int(time.time()) + time_span
+            if int(time_span / (60*60)) > 0:
+                amount_of_unit = round(time_span / (60*60))
+                unit = "hours"
+            elif int(time_span / 60) > 0:
+                amount_of_unit = round(time_span / 60)
+                unit = "minutes"
+            else:
+                amount_of_unit = time_span
+                unit = "seconds"
+                
+            self.send_to(channel, f"{nick} set a repel.  Pokemon won't appear for another {amount_of_unit} {unit}.")
 
     def parse_commands(self, nick):
         """Parses a #commands command.  Tells player the names of all commands."""
-        self.send_to(nick, "#starter #go #examine #team #pc #swap #repel #release #catch #commands #pokecount #pokedex #challenge #challenge-accept #challenge-decline #pokefind #set-evolve")
+        self.send_to(nick, "#starter #go #examine #team #pc #swap #release #catch #commands #pokecount #pokedex #challenge #challenge-accept #challenge-decline #pokefind #set-evolve #repel #unrepel")
 
     def parse_test(self, nick):
         """Used for tests."""
@@ -1602,6 +1654,16 @@ class Client(object):
             channel.reset_next_wild()
             channel.fainted_pokemon = loser
             loser.defeated_by = winning_trainer
+            print("STARTING COUNT POKEMON")
+            ever_owned = self.count_pokemon(winning_trainer)
+            print("ENDING COUNT POKEMON")
+            print(loser.name)
+            print(loser.name, ever_owned)
+            if loser.name in ever_owned:
+            #hp_color = "\x0308"
+                message += f"{nick} has \x0307already\x03 caught a {loser.name} before!"
+            else:
+                message += f"{nick} has \x0311never\x03 caught a {loser.name} before! "
         else:
             challenger = channel.challenge["challenger"]
             challenger_alive = list(filter(lambda pkmn: pkmn._hp > 0, challenger.party))
@@ -1732,6 +1794,36 @@ class Client(object):
         for p in self.players:
             p.increment_potions
 
+    def get_names(self, split):
+        """Get all the names in an IRC channel"""
+        channel = split[4]
+        for c in self.channels:
+            if c.name == channel:
+                the_channel = c
+                break
+        if not the_channel: 
+            return
+        channel = the_channel
+        names = split[5:]
+        for n in names:
+            if n[0] in "~@%&":
+                nick = n.strip("~@%&+")
+                channel.ops.add(nick)
+  
+    def handle_mode(self, split):
+        """Handles mode changes, such as for opping/deopping"""
+        channel = split[2]
+        channel = self.get_channel(channel)
+        if not channel: return
+        mode_word = split[3]
+        if mode_word[0] == "+":
+            if mode_word[1] in "oh":
+                channel.ops.add(split[4])
+        if mode_word[0] == "-":
+            if mode_word[1] in "oh":
+                if split[4] in channel.ops:
+                    channel.ops.remove(split[4])
+
     def loop(self):
         """The main loop of the program."""
         self.is_connected = True
@@ -1789,37 +1881,48 @@ class Client(object):
                 print(e)
 
             if data_received:
-                data = data.lstrip(":")
-                data = data.split()
-                if not data:
+                lines = data.split("\r\n")
+                if not lines:
                     continue
-                first_arg = data[0]
-                try:
-                    second_arg = data[1]
-                except: continue
-                
-                if first_arg.lower() == "ping":
-                    self.handle_ping(data)
-                elif second_arg and second_arg.lower() == "pong":
-                    self.handle_pong()
-                elif second_arg and second_arg.lower() == "001":
-                    self.post_registration()
-                elif second_arg and second_arg.lower() == "privmsg":
+                for line in lines:
+                    line = line.strip(":")
+                    split = line.split()
+                    if not split:
+                        continue
+
+                    first_arg = split[0]
                     try:
-                        self.handle_privmsg(data)
-                    except BadChanCommand as e:
-                        self.send_to(e.channel, e.text)
-                    except BadPrivMsgCommand as e:
-                        nick = e.nick
-                        self.send_to(nick, e.text)
-                    except Exception as e:
-                        exception_type, exception_object, exception_traceback = sys.exc_info()
-                        line_number = exception_traceback.tb_lineno
-                        print(exception_type, exception_object, exception_traceback)
-                        print(line_number)
-                        print(e)
-                        print(traceback.format_exc())
-                        pass
+                        second_arg = split[1]
+                    except: continue
+                    
+                    if first_arg.lower() == "ping":
+                        self.handle_ping(split)
+                    elif second_arg and second_arg.lower() == "pong":
+                        self.handle_pong()
+                    elif second_arg and second_arg.lower() == "mode":
+                        self.handle_mode(split)
+                    # Basic registration information
+                    elif second_arg and second_arg.lower() == "001":
+                        self.post_registration()
+                    # NAMES you get when you join a channel, which we need to know who the ops are
+                    elif second_arg and second_arg.lower() == "353":
+                        self.get_names(split)
+                    elif second_arg and second_arg.lower() == "privmsg":
+                        try:
+                            self.handle_privmsg(split)
+                        except BadChanCommand as e:
+                            self.send_to(e.channel, e.text)
+                        except BadPrivMsgCommand as e:
+                            nick = e.nick
+                            self.send_to(nick, e.text)
+                        except Exception as e:
+                            exception_type, exception_object, exception_traceback = sys.exc_info()
+                            line_number = exception_traceback.tb_lineno
+                            print(exception_type, exception_object, exception_traceback)
+                            print(line_number)
+                            print(e)
+                            print(traceback.format_exc())
+                            pass
             if not self.client_ready:
                 continue
             if self.current_time >= next_heal_time:
@@ -1846,21 +1949,27 @@ class Client(object):
                             c.challenge = None
 
 
-                # if it's time for the pokemon to show up, send it out
-                if c.is_encounter_time() and not c.wild_pokemon:
-                    c.fainted_pokemon = None
-                    c.wild_pokemon = c.make_next_wild_pokemon()
-                    c.wild_pokemon_time = int(time.time()) + 600
-                    self.send_to(c.name, f"A wild {c.wild_pokemon} appeared!")
+                if c.repelling:
+                    if self.current_time >= c.repel_end_time:
+                        c.repelling = False
+                        self.send_to(c, "Repel has worn off")
+                        c.reset_next_wild()
+                else: 
+                    # if it's time for the pokemon to show up, send it out
+                    if c.is_encounter_time() and not c.wild_pokemon:
+                        c.fainted_pokemon = None
+                        c.wild_pokemon = c.make_next_wild_pokemon()
+                        c.wild_pokemon_time = int(time.time()) + 600
+                        self.send_to(c.name, f"A wild {c.wild_pokemon} appeared!")
 
-                #if it's time for the pokemon to wander off
-                if self.current_time >= c.wild_pokemon_time and c.wild_pokemon:# and c.current_privmsg > 0:
-                    pokemon_type = c.wild_pokemon.type
+                    #if it's time for the pokemon to wander off
+                    if self.current_time >= c.wild_pokemon_time and c.wild_pokemon:# and c.current_privmsg > 0:
+                        pokemon_type = c.wild_pokemon.type
 
-                    self.send_to(c.name, f"The wild {c.wild_pokemon} wandered off.")
-                    del c.wild_pokemon
-                    c.wild_pokemon = None
-                    c.reset_next_wild()
+                        self.send_to(c.name, f"The wild {c.wild_pokemon} wandered off.")
+                        del c.wild_pokemon
+                        c.wild_pokemon = None
+                        c.reset_next_wild()
                     
 
     def create_database(self):
