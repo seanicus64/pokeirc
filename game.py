@@ -1542,7 +1542,7 @@ class Client(object):
                 for c in self.channels:
                     challenge = c.challenge
                     if not challenge:
-                        raise BadPrivMsgCommand("ctnl: This text shouldn't show.  Tell sean if it does.")
+                        raise BadPrivMsgCommand(player.name, "ctnl: This text shouldn't show.  Tell sean if it does.")
                     challenger, challenged = challenge["challenger"], challenge["challenged"]
                     if nick == challenger.name:
                         which_container = challenge["challenger_party"]
@@ -1797,6 +1797,7 @@ class Client(object):
     def get_names(self, split):
         """Get all the names in an IRC channel"""
         channel = split[4]
+        the_channel = None
         for c in self.channels:
             if c.name == channel:
                 the_channel = c
