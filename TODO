@@ -1,4 +1,96 @@
-
+#TODO fix weird error with no "the_channel" resolving for getting nicks
+#
+#
+#b'PING #atheism\r\n'
+#b'PING #atheism\r\n'
+#<class 'IndexError'> list index out of range <traceback object at 0x7f3f73425c00>
+#1912
+#list index out of range
+#Traceback (most recent call last):
+#  File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 1912, in loop
+#      self.handle_privmsg(split)
+#        File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 916, in handle_privmsg
+#            player_cmd = split[0]
+#            IndexError: list index out of range
+#
+#            b'PING #atheism\r\n'
+#            b'PING #atheism\r\n'
+#            b'PRIVMSG #atheism :\x0304paine\x03 challenges \x0302joe\x03 to a battle with a team of \x03036\x03 (average level: \x030332\x0303\x03). \x0302joe\x03 has \x0303180\x03 seconds to \x0314#challenge-accept\x03 or \x0314#challenge-decline\x03.\r\n'
+#            b'PING #atheism\r\n'
+#            b'PRIVMSG #atheism :\x0302joe\x03 has accepted the challenge with a team of \x03036\x03 (average level: \x030311\x03). \x0304paine\x03 has \x030360\x03 seconds to send out the first pokemon with \x0314#go\x03.\r\n'
+#            b"PRIVMSG #atheism :paine's team: A:\x0304Arcanine\x03-35\x03|100%, B:\x0312Dragonair\x03-34\x03|100%, C:\x0307Golbat\x03-25\x03|100%, D:\x0314Graveler\x03-29\x03|100%, E:\x0302Gyarados\x03-41\x03|100%, F:\x0313Kadabra\x03-33\x03|100%\r\n"
+#            <class 'TypeError'> BadPrivMsgCommand.__init__() missing 1 required positional argument: 'text' <traceback object at 0x7f3f7346aa00>
+#            1912
+#            BadPrivMsgCommand.__init__() missing 1 required positional argument: 'text'
+#            Traceback (most recent call last):
+#              File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 1912, in loop
+#                  self.handle_privmsg(split)
+#                    File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 921, in handle_privmsg
+#                        self.parse_go(channel, nick, split)
+#                          File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 1587, in parse_go
+#                              index, container, pokemon = self.get_pokemon(which_pokemon, player, has_to_be="challenge_team_no_label")
+#                                File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 1545, in get_pokemon
+#                                    raise BadPrivMsgCommand("ctnl: This text shouldn't show.  Tell sean if it does.")
+#                                    TypeError: BadPrivMsgCommand.__init__() missing 1 required positional argument: 'text'
+#
+#                                    b'PING #atheism\r\n'
+#                                    b"PRIVMSG paine :Can't refer to pokemon by label. Use full name instead.\r\n"
+#                                    <class 'TypeError'> BadPrivMsgCommand.__init__() missing 1 required positional argument: 'text' <traceback object at 0x7f3f73469a40>
+#                                    1912
+#                                    BadPrivMsgCommand.__init__() missing 1 required positional argument: 'text'
+#
+#
+#                                     File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 1587, in parse_go
+#                                         index, container, pokemon = self.get_pokemon(which_pokemon, player, has_to_be="challenge_team_no_label")
+#                                           File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 1545, in get_pokemon
+#                                               raise BadPrivMsgCommand("ctnl: This text shouldn't show.  Tell sean if it does.")
+#                                               TypeError: BadPrivMsgCommand.__init__() missing 1 required positional argument: 'text'
+#
+#                                               b'PING #atheism\r\n'
+#                                               b"PRIVMSG paine :Can't refer to pokemon by label. Use full name instead.\r\n"
+#                                               <class 'TypeError'> BadPrivMsgCommand.__init__() missing 1 required positional argument: 'text' <traceback object at 0x7f3f73469a40>
+#                                               1912
+#                                               BadPrivMsgCommand.__init__() missing 1 required positional argument: 'text'
+#                                               Traceback (most recent call last):
+#                                                 File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 1912, in loop
+#                                                     self.handle_privmsg(split)
+#                                                       File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 921, in handle_privmsg
+#                                                           self.parse_go(channel, nick, split)
+#                                                             File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 1587, in parse_go
+#                                                                 index, container, pokemon = self.get_pokemon(which_pokemon, player, has_to_be="challenge_team_no_label")
+#                                                                   File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 1545, in get_pokemon
+#                                                                       raise BadPrivMsgCommand("ctnl: This text shouldn't show.  Tell sean if it does.")
+#                                                                       TypeError: BadPrivMsgCommand.__init__() missing 1 required positional argument: 'text'
+#
+#                                                                       <class 'TypeError'> BadPrivMsgCommand.__init__() missing 1 required positional argument: 'text' <traceback object at 0x7f3f7346a600>
+#                                                                       1912
+#                                                                       BadPrivMsgCommand.__init__() missing 1 required positional argument: 'text'
+#                                                                       Traceback (most recent call last):
+#                                                                         File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 1912, in loop
+#                                                                             self.handle_privmsg(split)
+#                                                                               File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 921, in handle_privmsg
+#                                                                                   self.parse_go(channel, nick, split)
+#                                                                                     File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 1587, in parse_go
+#                                                                                         index, container, pokemon = self.get_pokemon(which_pokemon, player, has_to_be="challenge_team_no_label")
+#                                                                                           File "/home/sean/projects/pokemon_deploy/pokeirc/./game.py", line 1545, in get_pokemon
+#                                                                                               raise BadPrivMsgCommand("ctnl: This text shouldn't show.  Tell sean if it does.")
+#                                                                                               TypeError: BadPrivMsgCommand.__init__() missing 1 required positional argument: 'text'
+#
+#                                                                                               b'PING #atheism\r\n'
+#                                                                                               b"PRIVMSG #atheism :paine didn't respond in time, and has forfeited the match.\r\n"
+#
+#21:39  ProfOak: Charmeleon ID:9906 Lvl:31 EXP:29791 HP:89 MaxHP:89 Health:100% Att:52 Def:47 SAtt:79 SDef:52 Spd:70 h_iv:12 a_iv:4 d_iv:2 sa_iv:31 sd_iv:3 spd_iv:16 h_ev:3929 
+#                a_ev:4482 d_ev:3864 sa_ev:4089 sd_ev:3987 spd_ev:4467 GrowthRate:medium-fast ExpToNextLevel:2977 Will_evolve:Yes
+#                21:39  ProfOak: You've healed Charmeleon-31 to full health!  You now have 4 potion(s).
+#                21:39  ProfOak: You've healed Charmeleon-31 to full health!  You now have 3 potion(s).
+#                21:39  ProfOak: Charmeleon ID:9906 Lvl:32 EXP:31295 HP:65 MaxHP:92 Health:70% Att:54 Def:49 SAtt:81 SDef:54 Spd:72 h_iv:12 a_iv:4 d_iv:2 sa_iv:31 sd_iv:3 spd_iv:16 h_ev:4010 
+#                                a_ev:4584 d_ev:3941 sa_ev:4174 sd_ev:4062 spd_ev:4552 GrowthRate:medium-fast ExpToNextLevel:4642 Will_evolve:Yes
+#
+#TODO: this is broken!!!!  exp gained is not the same as exp to next level, but it's leveling up anyway
+#TODO: also shen's pikachu lost exp, and had a differnet ID?
+#
+#
+#go by itself crashes the bot
 
 #pcsort alpha
     A: 0 D: 20 M: 38 S: 60 ?: 77
@@ -18,6 +110,7 @@
 #lure 
     a pokemon in your level range pops up that moment
     only five of these a day
+
 #bait?  #travelto  #vote-location
     attract a certain type of pokemon to come
 #travel cave
