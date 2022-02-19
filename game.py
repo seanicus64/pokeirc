@@ -1907,6 +1907,7 @@ class Client(object):
                         self.post_registration()
                     # NAMES you get when you join a channel, which we need to know who the ops are
                     elif second_arg and second_arg.lower() == "353":
+                        print("ZZZZZZZZZ", split)
                         self.get_names(split)
                     elif second_arg and second_arg.lower() == "privmsg":
                         try:
