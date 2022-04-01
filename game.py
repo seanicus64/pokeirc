@@ -806,7 +806,7 @@ class Pokemon(object):
             oldcolor = False
             color = random.randrange(12)
             name = corrupted_names[self.name]
-            name = zalgolib.enzalgofy(self.name, 2)
+            name = zalgolib.enzalgofy(name, 2)
             for letter in name:
                 change_color = random.randrange(20)
                 if change_color < 1:
