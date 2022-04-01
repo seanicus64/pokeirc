@@ -10,7 +10,9 @@ import os
 import configparser
 import argparse
 import queue
-from datetime import datetime
+#from datetime import datetime
+from datetime import date
+import zalgolib
 W =     WHITE =     "\x0300"
 K =     BLACK =     "\x0301"
 B =     BLUE =      "\x0302"
@@ -124,7 +126,7 @@ starters = (
 # minimum level is the lowest level the pokemon will appear.  The maximum level is either 100, or the level it evolves at
 # those # added comments are just saying that I invented a level for pokemon to evovle at (normally they evolve through trading in the games
 
-pokemon_dict = {
+normal_pokemon_dict = {
     # name              idx     type         rare,grth,bexp     hp  att def satt sdef spd      evolution    lvl
     "Bulbasaur":        (1,     "grass",        2,2,64,         (45, 49, 49,  65,  65, 45), ("Ivysaur",         16),    8),
     "Ivysaur":          (2,     "grass",        2,2,141,        (60, 62, 63,  80,  80, 60), ("Venusaur",        32),   16),
@@ -278,6 +280,26 @@ pokemon_dict = {
     "Mewtwo":           (150,     "psychic",    3,3,220,        (106, 110, 90, 154, 90, 130),   ("XXXXXXX",     0),   70),
     "Mew":              (151,     "psychic",    3,2,64,         (100, 100, 100, 100, 100, 100), ("XXXXXXX",     0), 50),
     }
+missingnos = {                                                                                                                                                                   
+  # name              idx     type         rare,grth,bexp     hp  att def satt sdef spd      evolution    lvl                                                                    
+                                                                                                                                                                                 
+    # TODO: put proper types, add NICKNAMES to the game
+    "Missingno.":       (-1,        "flying",   -1,1,100,       (33,136,0,6,29,29),             ("XXXXXXX", 0),  0),                                                   
+    "Missingno1":       (-1,        "flying",   -1,1,100,       (33,136,0,6,29,29),             ("XXXXXXX", 0),  0),                                                   
+    "Missingno2":            (-5,        "normal",   -1,1,100,       (179,96,209,21,96,96),           ("XXXXXXX", 0),  0),                                                       
+    "Missingno3":           (-6,        "ghost",   -1,1,100,       (60,65,60,130,110,110),         ("XXXXXXX", 0),  0),                                                    
+    "Missingno4":     (-7,        "ground",   -1,1,100,       (232,147,145,136,128,128),      ("XXXXXXX", 0),  0),                                                 
+    "Missingno5":             (-8,        "normal",   -1,1,100,       (37,0,40,19,178,178),            ("XXXXXXX", 0),  0),                                                 
+    "Missingno6":        (-9,        "fighting",   -1,1,100,       (90,85,95,70,70,70),             ("XXXXXXX", 0),  0),                                                
+    "Missingno7":       (-10,       "ground",   -1,1,100,       (232,147,145,136,136,128),      ("XXXXXXX", 0),  0),                                                        
+    "Missingno8":             (-11,       "normal",   -1,1,100,       (179,96,209,21,21,96),          ("XXXXXXX", 0),  0),                                                
+    "Missingno9":            (-12,       "rock",   -1,1,100,       (35,45,160,30,30,70),           ("XXXXXXX", 0),  0),      
+    "Missingno0":            (-13,       "ground",   -1,1,100,       (232,147,145,136,136,128),      ("XXXXXXX", 0),  0),                                                             
+                                                                                                                                                                                 
+    }                                                                                                                                                    
+pokemon_dict = normal_pokemon_dict.copy()
+pokemon_dict.update(missingnos)
+print(pokemon_dict)
 slow_medium_levels = [0] # original formula has a negative
     # which caused an integer underflow.  Just set it to 0.
 
@@ -309,6 +331,7 @@ common = []
 average = []
 rare = []
 legendary = []
+glitch = []
 
 for p in pokemon_dict.keys():
     lowest_levels[p] = 0
@@ -326,8 +349,10 @@ for p, k in pokemon_dict.items():
         average.append(p)
     elif rarity == 2:
         rare.append(p)
-    else:
+    elif rarity == 3:
         legendary.append(p)
+    else:
+        glitch.append(p)
     stats = k[5]
     total = sum(stats)
     mean = int(total / 6)
@@ -348,6 +373,7 @@ class Channel(object):
         """Set up an IRC channel with defaults"""
         self.game = game
         encounter_type = encounter_info[0]
+        self.duration_time = encounter_info[3]
         self.repel_perms = "ops_only"
         self.repelling = False
         self.encounter_type = encounter_type
@@ -439,14 +465,24 @@ class Channel(object):
         # ensuring all wild pokemon are within proper ranges
         level = max(2, level)
         level = min(100, level)
+        
+        # April Fool's Day
+        is_april_fools_day = False
+        today = date.today()
+        if today.month == 4 and today.day < 4:
+            is_april_fools_day = True
+        is_april_fools_day = True
 
-       # Rareness:
-       # 0: 40% - Common Technically less rare but there are fewer in thsi category, making each species more common
-       # 1: 50% - Average rareness
-       # 2: 9% -  Rare
-       # 3: 1% - Legendary
+            
+
+        # Rareness:
+        # 0: 40% - Common Technically less rare but there are fewer in thsi category, making each species more common
+        # 1: 50% - Average rareness
+        # 2: 9% -  Rare
+        # 3: 1% - Legendary
         while True:
             random_num = random.randrange(100)
+            
             if random_num < 40:
                 species = random.choice(common)
             elif random_num < 90:
@@ -458,8 +494,14 @@ class Channel(object):
             # so we don't get level 2 charizards
             if lowest_levels[species] > level:
                 continue
+            pool = normal_pokemon_dict
+            if is_april_fools_day:
+                if random_num < 10:
+                    pool = missingnos
+                    print(missingnos)
+                    species = random.choice(list(missingnos.keys()))
             # so we don't get level 100 charmanders
-            evolution_level = pokemon_dict[species][6][1]
+            evolution_level = pool[species][6][1]
             if evolution_level != 0 and evolution_level <= level:
                 continue
             else: break
@@ -552,6 +594,10 @@ class Pokemon(object):
         """Initializes a pokemon.  Arguments are hte species and level.  Does not handle reloaded pokemon after the bot is restarted."""
         self.level = level
         self.name = species
+        if species.capitalize() in [p.capitalize() for p in missingnos.keys()]:
+            self.is_glitch = True
+        else:
+            self.is_glitch = False
         self.get_stats()
         # This is just random.  I'm not going to implement a faithful attack system.
         self.moves = [("attack", 40), ("attack", 80), ("special attack", 40), ("special attack", 80), ("lower defense")]
@@ -589,7 +635,10 @@ class Pokemon(object):
 
     def get_stats(self):
         """Sets the stats and data common according to the entire species"""
-        self.stats = pokemon_dict[self.name.capitalize()]
+        try:
+            self.stats = pokemon_dict[self.name.capitalize()]
+        except:
+            self.stats = pokemon_dict[self.name]
         self.pokemon_index = self.stats[0]
         self.type = self.stats[1]
         self.rarity = self.stats[2]
@@ -738,6 +787,36 @@ class Pokemon(object):
             hp_color = "\x0308"
         else:
             hp_color = "\x0304"
+        if self.name in missingnos.keys():
+            corrupted_names = {
+                "Missingno.": "Missingno.",
+                "Missingno1": "M̴̆i̷͌s̷̚s̸̕i̵̇n̷̛ǧ̵ñ̴o̴͗.̵̚",     
+                "Missingno2": "じお🮑🮑いゥ.4🬗🬗", 
+                "Missingno3": "hPOKé╮",         
+                "Missingno4": "PokéWTrainer╦",  
+                "Missingno5": "PKMN⑄Missing🮘🮫🮲",        
+                "Missingno6": "ゥL🭅BELLSPR神M4",       
+                "Missingno7": "♀P🮖ぜ数ゥT神",   
+                "Missingno8": "⁋神U⁁?",           
+                "Missingno9": "◣🮶お神ゥ8",      
+                "Missingno0": "PC🯉お4SH",       
+                }
+
+            return_string = ""
+            oldcolor = False
+            color = random.randrange(12)
+            name = corrupted_names[self.name]
+            name = zalgolib.enzalgofy(self.name, 2)
+            for letter in name:
+                change_color = random.randrange(20)
+                if change_color < 1:
+                    color = random.randrange(12)
+                if color != oldcolor:
+                    return_string += f"\x03{str(color).zfill(2)}"
+                    oldcolor = color
+                return_string += letter
+            return_string += f"-{hp_color}{self.level}\x03"
+            return return_string
         return f"\x03{type_color_dict[self.type]}{self.name}\x03-{hp_color}{self.level}\x03"
 
 
@@ -819,14 +898,16 @@ class Client(object):
             if encounter_type == "time":
                 min_time = int(config[name].get("min_time"))
                 max_time = int(config[name].get("max_time"))
-                channel = Channel(self, name, (encounter_type, min_time, max_time))
+                duration = int(config[name].get("duration"))
+                channel = Channel(self, name, (encounter_type, min_time, max_time, duration))
                 self.channels.append(channel)
 
             #PRIVMSG-based encounter channel
             elif encounter_type == "message":
                 minimum = int(config[name].get("min_msg"))
                 maximum = int(config[name].get("max_msg"))
-                channel = Channel(self, name, (encounter_type, minimum, maximum))
+                duration = int(config[name].get("duration"))
+                channel = Channel(self, name, (encounter_type, minimum, maximum, duration))
                 self.channels.append(channel)
 
             else:
@@ -881,6 +962,23 @@ class Client(object):
                 IRC_cmd = "NOTICE"
             recipient = recipient.name
 
+#        to_zalgofy = False
+#        for ch in message:
+#            print(ord(ch))
+#            if 768 <= ord(ch) <= 864:
+#                to_zalgofy = True
+#                print(True)
+#        all_words = message.split()
+#        for word in all_words:
+#            print(word.partition("-")[0])
+#            for k in missingnos.keys():
+#                print(k.partition("-")[0])
+#            if word.partition("-")[0].upper() in [k.upper() for k in missingnos.keys()]:
+#                to_zalgofy = True
+#        print(f"to zalgofy: {to_zalgofy}")
+#        if to_zalgofy:
+#            message = zalgolib.enzalgofy(message, 2)
+#            print(message)
         # IRC has limits for message length. Make it quite a bit shorter than it to make room for PRIVMSG, channel, etc
         length = len(message)
         num_messages = int(math.ceil(length/400))
@@ -1128,7 +1226,7 @@ class Client(object):
                     prevs.append("Eevee")
                     break
                 else:
-                    for k in list(reversed(pokemon_dict.keys())):
+                    for k in list(reversed(normal_pokemon_dict.keys())):
                             
                         possible_preevolve = k
                         data = pokemon_dict[k]
@@ -1961,13 +2059,14 @@ class Client(object):
                     if c.is_encounter_time() and not c.wild_pokemon:
                         c.fainted_pokemon = None
                         c.wild_pokemon = c.make_next_wild_pokemon()
-                        c.wild_pokemon_time = int(time.time()) + 600
+                        c.wild_pokemon_time = int(time.time()) + c.duration_time
                         self.send_to(c.name, f"A wild {c.wild_pokemon} appeared!")
 
                     #if it's time for the pokemon to wander off
                     if self.current_time >= c.wild_pokemon_time and c.wild_pokemon:# and c.current_privmsg > 0:
                         pokemon_type = c.wild_pokemon.type
 
+                        #if c.type == 
                         self.send_to(c.name, f"The wild {c.wild_pokemon} wandered off.")
                         del c.wild_pokemon
                         c.wild_pokemon = None
@@ -1981,7 +2080,12 @@ class Client(object):
         self.cur = self.con.cursor()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS trainers (trainer_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, nick TEXT NOT NULL UNIQUE)""")
         self.cur.execute("""CREATE TABLE IF NOT EXISTS pokemon (pokemon_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, species TEXT NOT NULL, trainer INTEGER, container_label TEXT,  experience INTEGER, hp INTEGER, health_iv INTEGER, attack_iv INTEGER, defense_iv INTEGER, sattack_iv INTEGER, sdefense_iv INTEGER, speed_iv INTEGER, health_ev INTEGER, attack_ev INTEGER, defense_ev INTEGER, sattack_ev INTEGER, sdefense_ev INTEGER, speed_ev INTEGER, times_evolved INTEGER DEFAULT 0, evolve_setting INTEGER DEFAULT 1, FOREIGN KEY (trainer) REFERENCES trainers(trainer_id))""")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS nicks (nick_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, pokemon_id INT, nick TEXT, FOREIGN KEY(pokemon_id) REFERENCES pokemon(pokemon_id))""")
         self.con.commit()
+
+    def sql_change_nick(self, pokemon, nick):
+        """Changes the nick of a pokemon."""
+        self.cur.execute(f"INSERT INTO nicks(pokemon_id, nick) VALUES (?, ?)", (pokemon.index, nick))
 
     def sql_add_trainer(self, nick):
         """Adds a player to the database."""
